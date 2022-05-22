@@ -5,6 +5,7 @@ module.exports.contactValidation = ({
   content,
 }) => {
   const message = {};
+
   if (!first_name) {
     message.first_name = "نام اجباری است";
   }
