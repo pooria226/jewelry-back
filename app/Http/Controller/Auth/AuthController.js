@@ -1,8 +1,8 @@
 const User = require("../../Model/User.js");
-const { codeGenerator } = require("../../../utils/codeGenerator.js");
-const { createTokne } = require("../../../utils/createToken.js");
-const { handleSendSms } = require("../../../utils/sms.js");
-const { verifyValidator } = require("../../validator/verifyValidator.js");
+const { codeGenerator } = require("../../../../utils/codeGenerator.js");
+const { createTokne } = require("../../../../utils/createToken.js");
+const { handleSendSms } = require("../../../../utils/sms.js");
+const { verifyValidator } = require("../../../validator/verifyValidator.js");
 const { isEmpty } = require("lodash");
 module.exports.receive = async (req, res) => {
   try {
@@ -20,8 +20,7 @@ module.exports.receive = async (req, res) => {
         `کد تایید شما ${code}`,
         user.phone
       );
-
-      if (status == 1) {
+      if (status == 200) {
         user.save();
         res.status(200).json({
           message: "لطفا کد تایید را وارد کنید",
@@ -59,10 +58,15 @@ module.exports.login = async (req, res) => {
         const token = await createTokne(user._id);
         user.code = null;
         user.created_code = null;
+        user.isVerifyd = true;
         user.save();
         res
           .status(200)
           .json({ message: "خوش اومدی", success: true, token: token });
+      } else {
+        res
+          .status(400)
+          .json({ message: "کد فعال سازی منقضی شده است", success: false });
       }
     } else {
       res
