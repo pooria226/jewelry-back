@@ -9,10 +9,64 @@ const { upload } = require("../../middleware/multer");
 const { isEmpty } = require("lodash");
 module.exports.currentUser = async (req, res) => {
   try {
-    const { id, phone, first_name, last_name, avatar } = req.user;
+    const user = await User.findOne({ id: req.user.id }).select(
+      "-code -created_code"
+    );
     res.status(200).json({
       success: true,
-      data: { id, phone, first_name, last_name, avatar },
+      data: user,
+    });
+  } catch (error) {
+    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+  }
+};
+module.exports.profile = async (req, res) => {
+  try {
+    const user = await User.findOne({ id: req.user.id }).select(
+      "-code -created_code"
+    );
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+  }
+};
+module.exports.profileUpdate = async (req, res) => {
+  try {
+    upload.uploadSingle(req, res, async (err) => {
+      if (err) {
+        return res.status(400).json({
+          success: false,
+          errors: [
+            {
+              key: "avatar",
+              message: " فایل باید با /jpeg|jpg|png|svg/ این پسوند ها باشد",
+            },
+          ],
+        });
+      } else {
+        const id = req.user.id;
+        const errors = updateValidator({ ...req.body, id: id });
+        if (errors.length > 0)
+          return res.status(400).json({ success: false, errors: errors });
+        const { first_name, last_name, code_meli, date_of_birth } = req.body;
+        const user = await User.findOneAndUpdate(
+          id,
+          {
+            first_name,
+            last_name,
+            avatar: !isEmpty(req.file)
+              ? req.get("origin") + "/uploads/" + req.file.filename
+              : undefined,
+            code_meli,
+            date_of_birth,
+          },
+          { omitUndefined: true, new: true }
+        );
+        res.status(200).json({ data: user, success: true });
+      }
     });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
@@ -44,7 +98,6 @@ module.exports.show = async (req, res) => {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }
 };
-
 module.exports.store = async (req, res) => {
   try {
     upload.uploadSingle(req, res, async (err) => {
@@ -59,7 +112,16 @@ module.exports.store = async (req, res) => {
           ],
         });
       } else {
-        const { first_name, last_name, phone, role } = req.body;
+        const {
+          first_name,
+          last_name,
+          phone,
+          role,
+          code_meli,
+          isVerifyd,
+          isActive,
+          date_of_birth,
+        } = req.body;
         const errors = storeValidator(req.body);
         if (errors.length > 0)
           return res.status(400).json({ success: false, errors: errors });
@@ -79,7 +141,11 @@ module.exports.store = async (req, res) => {
           last_name,
           phone,
           role,
-          avatar: "/public/uploads/" + req.file.filename,
+          avatar: req.get("origin") + "/uploads/" + req.file.filename,
+          code_meli,
+          isVerifyd,
+          isActive,
+          date_of_birth,
         });
         return res.status(200).json({
           success: true,
@@ -109,8 +175,16 @@ module.exports.update = async (req, res) => {
         const errors = updateValidator({ ...req.body, id: id });
         if (errors.length > 0)
           return res.status(400).json({ success: false, errors: errors });
-        const { first_name, last_name, phone, role, isVerifyd, isActive } =
-          req.body;
+        const {
+          first_name,
+          last_name,
+          phone,
+          role,
+          isVerifyd,
+          isActive,
+          code_meli,
+          date_of_birth,
+        } = req.body;
         const user = await User.findOneAndUpdate(
           id,
           {
@@ -121,8 +195,10 @@ module.exports.update = async (req, res) => {
             isVerifyd,
             isActive,
             avatar: !isEmpty(req.file)
-              ? "/public/uploads/" + req.file.filename
+              ? req.get("origin") + "/uploads/" + req.file.filename
               : undefined,
+            code_meli,
+            date_of_birth,
           },
           { omitUndefined: true, new: true }
         );

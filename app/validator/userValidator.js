@@ -53,18 +53,18 @@ const updateValidator = (data) => {
       "any.required": `شناسه یکتا اجباری است`,
     }),
     first_name: joi.string().messages({
-      "any.string": `نام اجباری است`,
+      "string.empty": `نام اجباری است`,
     }),
     last_name: joi.string().messages({
-      "any.string": `باید رشته از حروف باشد`,
+      "string.empty": `باید رشته از حروف باشد`,
     }),
     phone: joi.string().min(11).max(11).messages({
-      "any.string": `باید رشته از حروف باشد`,
+      "string.empty": `باید رشته از حروف باشد`,
       "string.min": `حداقل کارکتر باید یازده رقم باشد`,
       "string.max": `حداکثر کارکتر باید یازده رقم باشد`,
     }),
     role: joi.string().messages({
-      "any.string": `باید رشته از حروف باشد`,
+      "string.empty": `باید رشته از حروف باشد`,
     }),
     isActive: joi.boolean(),
     isVerifyd: joi.boolean(),
