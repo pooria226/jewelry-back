@@ -2,14 +2,15 @@ const User = require("../../Model/User.js");
 const { codeGenerator } = require("../../../../utils/codeGenerator.js");
 const { createTokne } = require("../../../../utils/createToken.js");
 const { handleSendSms } = require("../../../../utils/sms.js");
-const { verifyValidator } = require("../../../validator/verifyValidator.js");
-const { isEmpty } = require("lodash");
+const {
+  verifyValidator,
+  loginValidator,
+} = require("../../../validator/authValidator.js");
 module.exports.receive = async (req, res) => {
   try {
     const { phone } = req.body;
-    const errors = verifyValidator(req.body);
-    if (!isEmpty(errors))
-      return res.status(200).json({ errors, success: false });
+    const { error } = verifyValidator(req.body);
+    if (error) return res.status(200).json({ errors: error, success: false });
     const user = await User.findOne({ phone });
     if (!user) {
       await User.create({ phone });
@@ -50,6 +51,9 @@ module.exports.receive = async (req, res) => {
 module.exports.login = async (req, res) => {
   try {
     const { code, phone } = req.body;
+    const { error } = loginValidator(req.body);
+    console.log("error", error);
+    if (error) return res.status(401).json({ success: false, errors: error });
     const user = await User.findOne({ phone });
     const createdCode = new Date(user.created_code).getMinutes();
     const currentTime = new Date().getMinutes();
