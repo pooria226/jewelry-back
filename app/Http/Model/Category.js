@@ -5,8 +5,8 @@ const category = mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   ref: { type: mongoose.Schema.Types.ObjectId, refPath: "model" },
   model: { type: String, required: true, enum: ["blog", "product"] },
-  createdAt: { type: Date, default: Date.now() },
-  updatedAt: { type: Date, default: null },
+  created_at: { type: Date, default: Date.now() },
+  updated_at: { type: Date, default: null },
 });
 
 const Category = mongoose.model("Category", category);

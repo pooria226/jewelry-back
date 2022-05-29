@@ -6,6 +6,7 @@ const file = mongoose.Schema({
     ref: "Folder",
     default: null,
   },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   created_at: { type: Date, default: Date.now() },
   updated_at: { type: Date, default: null },
 });

@@ -52,13 +52,14 @@ module.exports.profileUpdate = async (req, res) => {
         if (errors.length > 0)
           return res.status(400).json({ success: false, errors: errors });
         const { first_name, last_name, code_meli, date_of_birth } = req.body;
+        const origin = req.protocol + "://" + req.get("host");
         const user = await User.findOneAndUpdate(
           id,
           {
             first_name,
             last_name,
             avatar: !isEmpty(req.file)
-              ? req.get("origin") + "/uploads/" + req.file.filename
+              ? origin + "/uploads/" + req.file.filename
               : undefined,
             code_meli,
             date_of_birth,
@@ -126,6 +127,7 @@ module.exports.store = async (req, res) => {
         if (errors.length > 0)
           return res.status(400).json({ success: false, errors: errors });
         const dupUser = await User.findOne({ phone });
+        const origin = req.protocol + "://" + req.get("host");
         if (dupUser)
           return res.status(400).json({
             success: false,
@@ -141,7 +143,7 @@ module.exports.store = async (req, res) => {
           last_name,
           phone,
           role,
-          avatar: req.get("origin") + "/uploads/" + req.file.filename,
+          avatar: origin + "/uploads/" + req.file.filename,
           code_meli,
           isVerifyd,
           isActive,
@@ -185,6 +187,7 @@ module.exports.update = async (req, res) => {
           code_meli,
           date_of_birth,
         } = req.body;
+        const origin = req.protocol + "://" + req.get("host");
         const user = await User.findOneAndUpdate(
           id,
           {
@@ -195,7 +198,7 @@ module.exports.update = async (req, res) => {
             isVerifyd,
             isActive,
             avatar: !isEmpty(req.file)
-              ? req.get("origin") + "/uploads/" + req.file.filename
+              ? origin + "/uploads/" + req.file.filename
               : undefined,
             code_meli,
             date_of_birth,
