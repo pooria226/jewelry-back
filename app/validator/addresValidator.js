@@ -2,31 +2,41 @@ const joi = require("joi");
 joi.objectId = require("joi-objectid")(joi);
 const storeValidator = (data) => {
   const schema = joi.object({
-    first_name: joi.string().required().messages({
-      "any.required": `نام  اجباری است`,
+    postal_address: joi.string().required().messages({
+      "any.required": `ادرس پستی اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    last_name: joi.string().required().messages({
-      "any.required": `نام خانوادگی اجباری است`,
+    province: joi.string().required().messages({
+      "any.required": `استان اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    post: joi.string().required().messages({
-      "any.required": `متن پیام اجباری است`,
+    city: joi.string().required().messages({
+      "any.required": `شهر اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    email: joi.string().messages({
+    plaque: joi.string().required().messages({
+      "any.required": `پلاک اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    telegram: joi.string().messages({
+    postal_code: joi.string().required().min(10).max(10).messages({
+      "any.required": `کد پستی اجباری است`,
+      "string.empty": `باید رشته ای از حروف باشد`,
+      "string.min": `حداقل کارکتر باید ده رقم باشد`,
+      "string.max": `حداکثر کارکتر باید ده رقم باشد`,
+    }),
+    unit: joi.string().messages({
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    whatsapp: joi.string().messages({
+    recipient_name: joi.string().required().messages({
+      "any.required": `نام گیرنده اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    instagram: joi.string().messages({
+    recipient_lastname: joi.string().required().messages({
+      "any.required": `نام خانوادگی گیرنده اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    avatar: joi.string().required().messages({
+    recipient_phone: joi.string().required().messages({
+      "any.required": `شماره تماس  گیرنده اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
   });
@@ -65,31 +75,41 @@ const updateValidator = (data) => {
     id: joi.string().required().messages({
       "any.required": `شناسه یکتا اجباری است`,
     }),
-    first_name: joi.string().messages({
-      "any.required": `نام  اجباری است`,
+    postal_address: joi.string().messages({
+      "any.required": `ادرس پستی اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    last_name: joi.string().messages({
-      "any.required": `نام خانوادگی اجباری است`,
+    province: joi.string().messages({
+      "any.required": `استان اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    post: joi.string().messages({
-      "any.required": `متن پیام اجباری است`,
+    city: joi.string().messages({
+      "any.required": `شهر اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    email: joi.string().messages({
+    plaque: joi.string().messages({
+      "any.required": `پلاک اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    telegram: joi.string().messages({
+    postal_code: joi.string().min(10).max(10).messages({
+      "any.required": `کد پستی اجباری است`,
+      "string.empty": `باید رشته ای از حروف باشد`,
+      "string.min": `حداقل کارکتر باید ده رقم باشد`,
+      "string.max": `حداکثر کارکتر باید ده رقم باشد`,
+    }),
+    unit: joi.string().messages({
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    whatsapp: joi.string().messages({
+    recipient_name: joi.string().messages({
+      "any.required": `نام گیرنده اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    instagram: joi.string().messages({
+    recipient_lastname: joi.string().messages({
+      "any.required": `نام خانوادگی گیرنده اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    avatar: joi.string().messages({
+    recipient_phone: joi.string().messages({
+      "any.required": `شماره تماس  گیرنده اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
   });
@@ -126,6 +146,6 @@ const deleteValidator = (data) => {
 module.exports = {
   storeValidator,
   showValidator,
-  deleteValidator,
   updateValidator,
+  deleteValidator,
 };

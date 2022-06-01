@@ -11,6 +11,7 @@ const storeValidator = (data) => {
       "any.required": `model اجباری است`,
       "string.empty": `model اجباری است`,
     }),
+    parent_id: joi.string().required(),
   });
   const { error } = schema.validate(data, { abortEarly: false });
   const array = [];
@@ -56,6 +57,7 @@ const updateValidator = (data) => {
       "any.required": `model اجباری است`,
       "string.empty": `model اجباری است`,
     }),
+    parent_id: joi.string(),
   });
   const { error } = schema.validate(data, { abortEarly: false });
   const array = [];

@@ -7,6 +7,9 @@ const AboutController = require("../app/Http/Controller/AboutController");
 const CategoryController = require("../app/Http/Controller/CategoryController");
 const TagController = require("../app/Http/Controller/TagController");
 const GalleryController = require("../app/Http/Controller/GalleryController");
+const AddressController = require("../app/Http/Controller/AddressController");
+const BlogController = require("../app/Http/Controller/BlogController");
+const ProductController = require("../app/Http/Controller/ProductController");
 const { authentication } = require("../app/middleware/authentication");
 
 // Start Auth
@@ -58,6 +61,27 @@ router.delete(
 );
 // End Gallery
 
+// Start Address
+router.get("/address/all", authentication, AddressController.all);
+router.post("/address", authentication, AddressController.store);
+router.get("/address/:id", authentication, AddressController.show);
+router.put("/address/:id", authentication, AddressController.update);
+router.delete("/address/:id", authentication, AddressController.delete);
+// End Address
+
+// Start Blog
+router.get("/blog/all/:page", authentication, BlogController.all);
+router.post("/blog", authentication, BlogController.store);
+router.get("/blog/:id", authentication, BlogController.show);
+router.put("/blog/:id", authentication, BlogController.update);
+router.delete("/blog/:id", authentication, BlogController.delete);
+// End Blog
+
+// Start Product
+router.get("/product/all/:page", authentication, ProductController.all);
+router.post("/product", authentication, ProductController.store);
+// End Product
+
 // Start Contact
 router.get("/contact/all", authentication, ContactController.all);
 router.get("/contact/:id", authentication, ContactController.show);
@@ -68,8 +92,9 @@ router.delete("/contact/:id", authentication, ContactController.delete);
 // Start about
 router.get("/about/team", authentication, AboutController.all);
 router.post("/about/team", authentication, AboutController.store);
-// router.post("/about/team", AboutController.store);
-// router.delete("/about/team/:id", authentication, AboutController.delete);
+router.get("/about/team/:id", authentication, AboutController.show);
+router.put("/about/team/:id", authentication, AboutController.update);
+router.delete("/about/team/:id", authentication, AboutController.delete);
 // End about
 
 module.exports = router;

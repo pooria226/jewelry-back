@@ -1,4 +1,5 @@
 const User = require("../Model/User.js");
+const File = require("../Model/File.js");
 const {
   storeValidator,
   deleteValidator,
@@ -101,59 +102,46 @@ module.exports.show = async (req, res) => {
 };
 module.exports.store = async (req, res) => {
   try {
-    upload.uploadSingle(req, res, async (err) => {
-      if (err) {
-        return res.status(400).json({
-          success: false,
-          errors: [
-            {
-              key: "avatar",
-              message: " فایل باید با /jpeg|jpg|png|svg/ این پسوند ها باشد",
-            },
-          ],
-        });
-      } else {
-        const {
-          first_name,
-          last_name,
-          phone,
-          role,
-          code_meli,
-          isVerifyd,
-          isActive,
-          date_of_birth,
-        } = req.body;
-        const errors = storeValidator(req.body);
-        if (errors.length > 0)
-          return res.status(400).json({ success: false, errors: errors });
-        const dupUser = await User.findOne({ phone });
-        const origin = req.protocol + "://" + req.get("host");
-        if (dupUser)
-          return res.status(400).json({
-            success: false,
-            errors: [
-              {
-                key: "phone",
-                message: "کاربری با این شماره قبلا ثبت نام کرده",
-              },
-            ],
-          });
-        await User.create({
-          first_name,
-          last_name,
-          phone,
-          role,
-          avatar: origin + "/uploads/" + req.file.filename,
-          code_meli,
-          isVerifyd,
-          isActive,
-          date_of_birth,
-        });
-        return res.status(200).json({
-          success: true,
-          message: "کاربر با موفقیت اضافه شد",
-        });
-      }
+    const {
+      first_name,
+      last_name,
+      phone,
+      role,
+      code_meli,
+      isVerifyd,
+      isActive,
+      date_of_birth,
+      avatar,
+    } = req.body;
+    const errors = storeValidator(req.body);
+    if (errors.length > 0)
+      return res.status(400).json({ success: false, errors: errors });
+    const dupUser = await User.findOne({ phone });
+    if (dupUser)
+      return res.status(400).json({
+        success: false,
+        errors: [
+          {
+            key: "phone",
+            message: "کاربری با این شماره قبلا ثبت نام کرده",
+          },
+        ],
+      });
+    const image = await File.findById(avatar);
+    await User.create({
+      first_name,
+      last_name,
+      phone,
+      role,
+      avatar: image.name || null,
+      code_meli,
+      isVerifyd,
+      isActive,
+      date_of_birth,
+    });
+    return res.status(200).json({
+      success: true,
+      message: "کاربر با موفقیت اضافه شد",
     });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
@@ -161,53 +149,38 @@ module.exports.store = async (req, res) => {
 };
 module.exports.update = async (req, res) => {
   try {
-    upload.uploadSingle(req, res, async (err) => {
-      if (err) {
-        return res.status(400).json({
-          success: false,
-          errors: [
-            {
-              key: "avatar",
-              message: " فایل باید با /jpeg|jpg|png|svg/ این پسوند ها باشد",
-            },
-          ],
-        });
-      } else {
-        const { id } = req.params;
-        const errors = updateValidator({ ...req.body, id: id });
-        if (errors.length > 0)
-          return res.status(400).json({ success: false, errors: errors });
-        const {
-          first_name,
-          last_name,
-          phone,
-          role,
-          isVerifyd,
-          isActive,
-          code_meli,
-          date_of_birth,
-        } = req.body;
-        const origin = req.protocol + "://" + req.get("host");
-        const user = await User.findOneAndUpdate(
-          id,
-          {
-            first_name,
-            last_name,
-            phone,
-            role,
-            isVerifyd,
-            isActive,
-            avatar: !isEmpty(req.file)
-              ? origin + "/uploads/" + req.file.filename
-              : undefined,
-            code_meli,
-            date_of_birth,
-          },
-          { omitUndefined: true, new: true }
-        );
-        res.status(200).json({ data: user, success: true });
-      }
-    });
+    const { id } = req.params;
+    const errors = updateValidator({ ...req.body, id: id });
+    if (errors.length > 0)
+      return res.status(400).json({ success: false, errors: errors });
+    const {
+      first_name,
+      last_name,
+      phone,
+      role,
+      isVerifyd,
+      isActive,
+      code_meli,
+      date_of_birth,
+      avatar,
+    } = req.body;
+    const image = await File.findById(avatar);
+    const user = await User.findOneAndUpdate(
+      id,
+      {
+        first_name,
+        last_name,
+        phone,
+        role,
+        isVerifyd,
+        isActive,
+        avatar: image.name || undefined,
+        code_meli,
+        date_of_birth,
+      },
+      { omitUndefined: true, new: true }
+    );
+    res.status(200).json({ data: user, success: true });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }

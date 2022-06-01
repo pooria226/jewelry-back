@@ -17,8 +17,9 @@ module.exports.all = async (req, res) => {
 module.exports.show = async (req, res) => {
   try {
     const { id } = req.params;
-    const { error } = showValidator(req.params);
-    if (error) return res.status(401).json({ success: false, errors: error });
+    const errors = showValidator(req.params);
+    if (errors.length > 0)
+      return res.status(401).json({ success: false, errors: errors });
     const contact = await Contact.findOne({ id });
     res.status(200).json({ data: contact, success: true });
   } catch (error) {
@@ -28,8 +29,9 @@ module.exports.show = async (req, res) => {
 module.exports.store = async (req, res) => {
   try {
     const { first_name, last_name, phone, content } = req.body;
-    const { error } = storeValidator(req.body);
-    if (error) return res.status(200).json({ errors: error, success: false });
+    const errors = storeValidator(req.body);
+    if (errors.length > 0)
+      return res.status(200).json({ errors: errors, success: false });
     await Contact.create({ first_name, last_name, phone, content });
     const { status } = await handleSendSms(
       `پیام شما با موفقیت ثبت شد به زودی با شما ارتباط میگیریم`,
@@ -47,8 +49,9 @@ module.exports.store = async (req, res) => {
 module.exports.delete = async (req, res) => {
   try {
     const { id } = req.params;
-    const { error } = deleteValidator(req.params);
-    if (error) return res.status(401).json({ success: false, errors: error });
+    const errors = deleteValidator(req.params);
+    if (errors.length > 0)
+      return res.status(401).json({ success: false, errors: errors });
     await Contact.findByIdAndRemove(id);
     res.status(200).json({ message: "با موفقیت انجام شد", success: true });
   } catch (error) {

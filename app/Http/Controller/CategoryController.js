@@ -15,11 +15,17 @@ module.exports.all = async (req, res) => {
 };
 module.exports.store = async (req, res) => {
   try {
-    const { title, model } = req.body;
+    const { title, model, parent_id } = req.body;
     const errors = storeValidator(req.body);
     if (errors.length > 0)
       return res.status(400).json({ success: false, errors: errors });
-    await Category.create({ title, model, user: req.user.id });
+    const dupCategory = await Category.findOne({ title });
+    if (dupCategory)
+      return res.status(400).json({
+        success: false,
+        message: "دسته بندی ای با این عنوان دخیر شده است",
+      });
+    await Category.create({ title, model, user: req.user.id, parent_id });
     res.status(200).json({ success: true, message: "با موفقیت انجام شد" });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });

@@ -11,13 +11,14 @@ var uploadSingle = multer({
   fileFilter: function (_req, file, cb) {
     checkFileType(file, cb);
   },
-}).single("avatar");
+}).single("image");
 var uploadArray = multer({
   storage: storage,
   fileFilter: function (_req, file, cb) {
     checkFileType(file, cb);
   },
 }).array("images");
+
 function checkFileType(file, cb) {
   // Allowed ext
   const filetypes = /jpeg|jpg|png|svg/;
@@ -31,4 +32,4 @@ function checkFileType(file, cb) {
     cb(new Error("I don't have a clue!"));
   }
 }
-module.exports.upload = { uploadSingle, uploadArray };
+module.exports.upload = { uploadArray, uploadSingle };

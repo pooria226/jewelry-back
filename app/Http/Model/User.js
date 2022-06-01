@@ -18,6 +18,7 @@ const user = new mongoose.Schema({
   created_code: { type: Date, default: null },
   isVerifyed: { type: Boolean, default: false },
   isActive: { type: Boolean, default: true },
+  walet: { type: Number, default: 0 },
   created_at: { type: Date, default: Date.now() },
   updated_at: { type: Date, default: null },
 });

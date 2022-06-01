@@ -2,21 +2,26 @@ const joi = require("joi");
 joi.objectId = require("joi-objectid")(joi);
 const storeValidator = (data) => {
   const schema = joi.object({
-    first_name: joi.string().required().messages({
-      "any.required": `نام اجباری است`,
+    title: joi.string().required().messages({
+      "any.required": `عنوان اجباری است`,
+      "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    last_name: joi.string().required().messages({
-      "any.required": `نام خانوادگی اجباری است`,
+    slug: joi.string().required().messages({
+      "any.required": `اسلاگ اجباری است`,
+      "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    phone: joi.string().required().min(11).max(11).messages({
-      "any.required": `شماره همراه اجباری است`,
-      "string.min": `حداقل کارکتر باید یازده رقم باشد`,
-      "string.max": `حداکثر کارکتر باید یازده رقم باشد`,
+    content: joi.string().required().messages({
+      "any.required": `متن اجباری است`,
+      "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    role: joi.string().messages({
-      "any.required": `سطح درسترسی  اجباری است`,
+    tags: joi.array().messages({
+      "array.empty": `باید ارائه ای از برچسب ها باشد`,
     }),
-    avatar: joi.string().messages({
+    categories: joi.array().messages({
+      "any.required": `متن اجباری است`,
+      "array.empty": `باید ارائه ای از دسته بندی ها باشد`,
+    }),
+    author: joi.string().messages({
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
   });
@@ -54,26 +59,30 @@ const updateValidator = (data) => {
   const schema = joi.object({
     id: joi.string().required().messages({
       "any.required": `شناسه یکتا اجباری است`,
+      "string.empty": `شناسه یکتا اجباری است`,
     }),
-    first_name: joi.string().messages({
-      "string.empty": `نام اجباری است`,
-    }),
-    last_name: joi.string().messages({
-      "string.empty": `باید رشته از حروف باشد`,
-    }),
-    phone: joi.string().min(11).max(11).messages({
-      "string.empty": `باید رشته از حروف باشد`,
-      "string.min": `حداقل کارکتر باید یازده رقم باشد`,
-      "string.max": `حداکثر کارکتر باید یازده رقم باشد`,
-    }),
-    role: joi.string().messages({
-      "string.empty": `باید رشته از حروف باشد`,
-    }),
-    avatar: joi.string().messages({
+    title: joi.string().messages({
+      "any.required": `عنوان اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    isActive: joi.boolean(),
-    isVerifyd: joi.boolean(),
+    slug: joi.string().messages({
+      "any.required": `اسلاگ اجباری است`,
+      "string.empty": `باید رشته ای از حروف باشد`,
+    }),
+    content: joi.string().messages({
+      "any.required": `متن اجباری است`,
+      "string.empty": `باید رشته ای از حروف باشد`,
+    }),
+    tags: joi.array().messages({
+      "array.empty": `باید ارائه ای از برچسب ها باشد`,
+    }),
+    categories: joi.array().messages({
+      "any.required": `متن اجباری است`,
+      "array.empty": `باید ارائه ای از دسته بندی ها باشد`,
+    }),
+    author: joi.string().messages({
+      "string.empty": `باید رشته ای از حروف باشد`,
+    }),
   });
   const { error } = schema.validate(data, { abortEarly: false });
   const array = [];
@@ -87,7 +96,6 @@ const updateValidator = (data) => {
   }
   return array;
 };
-
 const deleteValidator = (data) => {
   const schema = joi.object({
     id: joi.string().required().messages({
@@ -106,10 +114,9 @@ const deleteValidator = (data) => {
   }
   return array;
 };
-
 module.exports = {
   storeValidator,
-  deleteValidator,
   showValidator,
   updateValidator,
+  deleteValidator,
 };
