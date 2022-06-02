@@ -23,6 +23,10 @@ router.post("/user/current", authentication, UserController.currentUser);
 router.get("/user/profile", authentication, UserController.profile);
 router.post("/user/walet", authentication, UserController.walet);
 router.get("/user/walet/verify", UserController.verifyWalet);
+router.get("/user/orders/all", authentication, UserController.ordersAll);
+router.post("/user/orders/pay", authentication, UserController.ordersPay);
+router.get("/user/orders/verify", UserController.verifyOrder);
+router.post("/user/orders", authentication, UserController.ordersStore);
 router.post("/user/profile", authentication, UserController.profileUpdate);
 router.post("/user/all", authentication, UserController.all);
 router.post("/user", authentication, UserController.store);
@@ -82,7 +86,9 @@ router.delete("/blog/:id", authentication, BlogController.delete);
 
 // Start Product
 router.get("/product/all/:page", authentication, ProductController.all);
+router.get("/product/:id", authentication, ProductController.show);
 router.post("/product", authentication, ProductController.store);
+router.put("/product/:id", authentication, ProductController.update);
 // End Product
 
 // Start Payment

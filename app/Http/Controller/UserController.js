@@ -1,11 +1,13 @@
 const User = require("../Model/User.js");
 const File = require("../Model/File.js");
+const Order = require("../Model/Order.js");
 const ZarinpalCheckout = require("zarinpal-checkout");
 const {
   storeValidator,
   deleteValidator,
   showValidator,
   updateValidator,
+  orderStoreValidator,
 } = require("../../validator/userValidator");
 const { upload } = require("../../middleware/multer");
 const { isEmpty } = require("lodash");
@@ -55,7 +57,7 @@ module.exports.profileUpdate = async (req, res) => {
           return res.status(400).json({ success: false, errors: errors });
         const { first_name, last_name, code_meli, date_of_birth } = req.body;
         const origin = req.protocol + "://" + req.get("host");
-        const user = await User.findOneAndUpdate(
+        const user = await User.findByIdAndUpdate(
           id,
           {
             first_name,
@@ -82,7 +84,7 @@ module.exports.walet = async (req, res) => {
       Amount: amount,
       CallbackURL: "http://localhost:3000/api/user/walet/verify",
       Description: "A Payment from jewelry",
-      Mobile: req.user.findById,
+      Mobile: req.user.phone,
     });
     if (result.status == 100) {
       await Payment.create({
@@ -117,6 +119,137 @@ module.exports.verifyWalet = async (req, res) => {
         const user = await User.findById(payment.user);
         user.walet += parseInt(payment.amount || 0);
         await user.save();
+        res.redirect("https://jewelry.iran.liara.run/");
+      }
+    } else {
+      res.redirect("https://jewelry.iran.liara.run/");
+    }
+  } catch (error) {
+    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+  }
+};
+module.exports.ordersAll = async (req, res) => {
+  try {
+    const orders = await Order.find({ user: req.user.id, pay: false }).populate(
+      {
+        path: "products",
+        select: "title price",
+      }
+    );
+    res.status(200).json({ data: orders, success: true });
+  } catch (error) {
+    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+  }
+};
+module.exports.ordersStore = async (req, res) => {
+  try {
+    const { products } = req.body;
+    const errors = orderStoreValidator(req.body);
+    if (errors.length > 0)
+      return res.status(400).json({ success: false, errors: errors });
+    await Order.create({
+      user: req.user.id,
+      products,
+    });
+    res
+      .status(200)
+      .json({ message: "سفارش با موفقیت اضافه شد", success: true });
+  } catch (error) {
+    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+  }
+};
+module.exports.ordersPay = async (req, res) => {
+  try {
+    const { order_id, useWalet } = req.body;
+    let amount = 0;
+    const orders = await Order.findById(order_id).populate({
+      path: "products",
+      select: "title price",
+    });
+    const product_price = orders.products.reduce((acc, item) => {
+      return (acc += item.price);
+    }, 0);
+    if (useWalet == 1) {
+      const user = await User.findById(req.user.id);
+      const walet = user.walet;
+      if (product_price > walet) {
+        amount = product_price - walet;
+        const result = await zarinpal.PaymentRequest({
+          Amount: amount,
+          CallbackURL: "http://localhost:3000/api/user/orders/verify",
+          Description: "A Payment from jewelry",
+          Mobile: req.user.phone,
+        });
+        if (result.status == 100) {
+          await Payment.create({
+            user: req.user.id,
+            amount: amount,
+            authority: result.authority,
+            orders: orders.id,
+          });
+          res.status(200).json({ success: true, data: result.url });
+        } else {
+          res.status(400).json({ message: "مشکلی پیش امده", success: false });
+        }
+      } else {
+        const remaining = walet - product_price;
+        user.walet = remaining;
+        await user.save();
+        const order = await Order.findById(order_id);
+        console.log("order", order);
+        order.pay = true;
+        order.status = 1;
+        await order.save();
+        res
+          .status(200)
+          .json({ success: true, message: "پرداخت با موفقیت انجام شد" });
+      }
+    } else {
+      amount = product_price;
+      const result = await zarinpal.PaymentRequest({
+        Amount: amount,
+        CallbackURL: "http://localhost:3000/api/user/orders/verify",
+        Description: "A Payment from jewelry",
+        Mobile: req.user.phone,
+      });
+      if (result.status == 100) {
+        await Payment.create({
+          user: req.user.id,
+          amount: amount,
+          authority: result.authority,
+          orders: orders.id,
+        });
+        res.status(200).json({ success: true, data: result.url });
+      } else {
+        res.status(400).json({ message: "مشکلی پیش امده", success: false });
+      }
+    }
+
+    // const amount=orders
+  } catch (error) {
+    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+  }
+};
+module.exports.verifyOrder = async (req, res) => {
+  try {
+    const authority = req.query.Authority;
+    const status = req.query.Status;
+    const payment = await Payment.findOne({ authority });
+    if (status == "OK") {
+      const result = await zarinpal.PaymentVerification({
+        Amount: payment.amount,
+        Authority: authority,
+      });
+      if (result.status == -21) {
+        res.redirect("https://jewelry.iran.liara.run/");
+      } else {
+        payment.ref_id = result.RefID;
+        payment.success = true;
+        await payment.save();
+        const order = await Order.findById(payment.orders);
+        order.pay = true;
+        order.status = 1;
+        await order.save();
         res.redirect("https://jewelry.iran.liara.run/");
       }
     } else {
@@ -217,7 +350,7 @@ module.exports.update = async (req, res) => {
       avatar,
     } = req.body;
     const image = await File.findById(avatar);
-    const user = await User.findOneAndUpdate(
+    const user = await User.findByIdAndUpdate(
       id,
       {
         first_name,
@@ -229,6 +362,7 @@ module.exports.update = async (req, res) => {
         avatar: image.name || undefined,
         code_meli,
         date_of_birth,
+        updated_at: Date.now(),
       },
       { omitUndefined: true, new: true }
     );

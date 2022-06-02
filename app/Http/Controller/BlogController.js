@@ -1,7 +1,5 @@
 const Blog = require("../Model/Blog");
 const File = require("../Model/File");
-const { upload } = require("../../middleware/multer");
-const { isEmpty } = require("lodash");
 const {
   storeValidator,
   showValidator,
@@ -17,7 +15,7 @@ module.exports.all = async (req, res) => {
       .skip((page - 1) * perPage)
       .limit(perPage)
       .populate({ path: "tags", select: "id title" })
-      .populate({ path: "categories" })
+      .populate({ path: "category" })
       .sort({ create_at: 1 });
     const blogs_count = await (await Blog.find()).length;
     const pages = Math.ceil(blogs_count / perPage);
@@ -32,7 +30,7 @@ module.exports.all = async (req, res) => {
 
 module.exports.store = async (req, res) => {
   try {
-    const { title, slug, content, tags, categories, author, image_origin } =
+    const { title, slug, content, tags, category, author, image_origin } =
       req.body;
     const errors = storeValidator(req.body);
     if (errors.length > 0)
@@ -43,15 +41,14 @@ module.exports.store = async (req, res) => {
         errors: [{ key: "title", message: "مقاله ای با این نام ثبت شده است" }],
         success: false,
       });
-    const image = await File.findById(image_origin);
     await Blog.create({
       title,
       slug,
       content,
       tags,
-      categories,
+      category,
       author,
-      image_origin: image.name,
+      image_origin: image_origin,
     });
     res.status(200).json({ message: "با  موفقیت انجام شد", success: true });
   } catch (error) {
@@ -73,23 +70,22 @@ module.exports.show = async (req, res) => {
 module.exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, slug, content, tags, categories, author, image_origin } =
+    const { title, slug, content, tags, category, author, image_origin } =
       req.body;
-    console.log("tags", tags);
     const errors = updateValidator({ ...req.body, id: id });
     if (errors.length > 0)
       return res.status(401).json({ success: false, errors: errors });
-    const image = await File.findById(image_origin);
-    await Blog.findOneAndUpdate(
+    await Blog.findByIdAndUpdate(
       id,
       {
         title,
         slug,
         content,
         tags,
-        categories,
+        category,
         author,
-        image_origin: image.name || undefined,
+        image_origin: image_origin,
+        updated_at: Date.now(),
       },
       { omitUndefined: true, new: true }
     );

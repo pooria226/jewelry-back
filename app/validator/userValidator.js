@@ -106,10 +106,31 @@ const deleteValidator = (data) => {
   }
   return array;
 };
+const orderStoreValidator = (data) => {
+  const schema = joi.object({
+    products: joi.array().required().messages({
+      "any.required": `محصولات اجباری است`,
+      "array.empty": `باید ارائه ای از محصولات باشه`,
+      "array.base": `باید ارائه ای از محصولات باشه`,
+    }),
+  });
+  const { error } = schema.validate(data, { abortEarly: false });
+  const array = [];
+  if (error) {
+    error.details.map((item, index) => {
+      array.push({
+        key: item.path[0],
+        message: item.message,
+      });
+    });
+  }
+  return array;
+};
 
 module.exports = {
   storeValidator,
   deleteValidator,
   showValidator,
   updateValidator,
+  orderStoreValidator,
 };

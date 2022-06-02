@@ -100,7 +100,7 @@ module.exports.update = async (req, res) => {
           },
         ],
       });
-    await Address.findOneAndUpdate(
+    await Address.findByIdAndUpdate(
       id,
       {
         postal_address,
@@ -113,6 +113,7 @@ module.exports.update = async (req, res) => {
         recipient_lastname,
         recipient_phone,
         user: req.user.id,
+        updated_at: Date.now(),
       },
       { omitUndefined: true, new: true }
     );

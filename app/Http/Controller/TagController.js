@@ -55,10 +55,11 @@ module.exports.update = async (req, res) => {
       return res
         .status(400)
         .json({ success: false, message: "برچسبی با این عنوان ثبت شده است" });
-    await Tag.findOneAndUpdate(
+    await Tag.findByIdAndUpdate(
       id,
       {
         title,
+        updated_at: Date.now(),
       },
       { omitUndefined: true, new: true }
     );

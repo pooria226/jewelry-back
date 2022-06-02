@@ -10,22 +10,27 @@ const storeValidator = (data) => {
       "any.required": `اسلاگ اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    content: joi.string().required().messages({
-      "any.required": `متن اجباری است`,
-      "string.empty": `باید رشته ای از حروف باشد`,
+    price: joi.number().required().messages({
+      "any.required": `قیمت اجباری است`,
+      "number.empty": `باید عدد باشد`,
+    }),
+    weight: joi.number().required().messages({
+      "any.required": `وزن اجباری است`,
+      "number.empty": `باید عدد باشد`,
     }),
     image_origin: joi.string().required().messages({
       "any.required": `عکس اصلی اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    tags: joi.array().messages({
-      "array.empty": `باید ارائه ای از برچسب ها باشد`,
+    images: joi.array().messages({
+      "array.empty": `باید ارائه ای از عکس ها باشد`,
     }),
     category: joi.string().messages({
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    author: joi.string().messages({
-      "string.empty": `باید رشته ای از حروف باشد`,
+    carat: joi.number().required().messages({
+      "any.required": `عیار طلا اجباری است`,
+      "number.empty": `باید عدد باشد`,
     }),
   });
   const { error } = schema.validate(data, { abortEarly: false });
@@ -72,21 +77,27 @@ const updateValidator = (data) => {
       "any.required": `اسلاگ اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
+    price: joi.number().messages({
+      "any.required": `قیمت اجباری است`,
+      "number.empty": `باید عدد باشد`,
+    }),
+    weight: joi.number().messages({
+      "any.required": `وزن اجباری است`,
+      "number.empty": `باید عدد باشد`,
+    }),
     image_origin: joi.string().messages({
+      "any.required": `عکس اصلی اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    content: joi.string().messages({
-      "any.required": `متن اجباری است`,
-      "string.empty": `باید رشته ای از حروف باشد`,
-    }),
-    tags: joi.array().messages({
-      "array.empty": `باید ارائه ای از برچسب ها باشد`,
+    images: joi.array().messages({
+      "array.empty": `باید ارائه ای از عکس ها باشد`,
     }),
     category: joi.string().messages({
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    author: joi.string().messages({
-      "string.empty": `باید رشته ای از حروف باشد`,
+    carat: joi.number().messages({
+      "any.required": `عیار طلا اجباری است`,
+      "number.empty": `باید عدد باشد`,
     }),
   });
   const { error } = schema.validate(data, { abortEarly: false });
@@ -123,5 +134,4 @@ module.exports = {
   storeValidator,
   showValidator,
   updateValidator,
-  deleteValidator,
 };

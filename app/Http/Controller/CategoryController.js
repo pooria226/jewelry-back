@@ -55,6 +55,7 @@ module.exports.update = async (req, res) => {
       {
         title,
         model,
+        updated_at: Date.now(),
       },
       { omitUndefined: true, new: true }
     );

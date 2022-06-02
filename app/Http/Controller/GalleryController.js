@@ -96,6 +96,7 @@ module.exports.updateFolder = async (req, res) => {
       folder_id,
       {
         name,
+        updated_at: Date.now(),
       },
       { omitUndefined: true, new: true }
     );

@@ -76,7 +76,7 @@ module.exports.update = async (req, res) => {
     if (errors.length > 0)
       return res.status(401).json({ success: false, errors: errors });
     const image = await File.findById(avatar);
-    await Team.findOneAndUpdate(
+    await Team.findByIdAndUpdate(
       id,
       {
         first_name,
@@ -87,6 +87,7 @@ module.exports.update = async (req, res) => {
         whatsapp,
         instagram,
         avatar: image.name || undefined,
+        updated_at: Date.now(),
       },
       { omitUndefined: true, new: true }
     );
