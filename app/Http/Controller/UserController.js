@@ -1,5 +1,6 @@
 const User = require("../Model/User.js");
 const File = require("../Model/File.js");
+const ZarinpalCheckout = require("zarinpal-checkout");
 const {
   storeValidator,
   deleteValidator,
@@ -8,11 +9,11 @@ const {
 } = require("../../validator/userValidator");
 const { upload } = require("../../middleware/multer");
 const { isEmpty } = require("lodash");
+const Payment = require("../Model/Payment.js");
+const zarinpal = ZarinpalCheckout.create(process.env.MERCHANTId, true);
 module.exports.currentUser = async (req, res) => {
   try {
-    const user = await User.findOne({ id: req.user.id }).select(
-      "-code -created_code"
-    );
+    const user = await User.findById(req.user.id).select("-code -created_code");
     res.status(200).json({
       success: true,
       data: user,
@@ -70,6 +71,57 @@ module.exports.profileUpdate = async (req, res) => {
         res.status(200).json({ data: user, success: true });
       }
     });
+  } catch (error) {
+    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+  }
+};
+module.exports.walet = async (req, res) => {
+  try {
+    const { amount } = req.body;
+    const result = await zarinpal.PaymentRequest({
+      Amount: amount,
+      CallbackURL: "http://localhost:3000/api/user/walet/verify",
+      Description: "A Payment from jewelry",
+      Mobile: req.user.findById,
+    });
+    if (result.status == 100) {
+      await Payment.create({
+        user: req.user.id,
+        amount: amount,
+        authority: result.authority,
+      });
+      res.status(200).json({ success: true, data: result.url });
+    } else {
+      res.status(400).json({ message: "مشکلی پیش امده", success: false });
+    }
+  } catch (error) {
+    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+  }
+};
+module.exports.verifyWalet = async (req, res) => {
+  try {
+    const authority = req.query.Authority;
+    const status = req.query.Status;
+    const payment = await Payment.findOne({ authority });
+    if (status == "OK") {
+      const result = await zarinpal.PaymentVerification({
+        Amount: payment.amount,
+        Authority: authority,
+      });
+      if (result.status == -21) {
+        res.redirect("https://jewelry.iran.liara.run/");
+      } else {
+        payment.ref_id = result.RefID;
+        payment.success = true;
+        await payment.save();
+        const user = await User.findById(payment.user);
+        user.walet += parseInt(payment.amount || 0);
+        await user.save();
+        res.redirect("https://jewelry.iran.liara.run/");
+      }
+    } else {
+      res.redirect("https://jewelry.iran.liara.run/");
+    }
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }

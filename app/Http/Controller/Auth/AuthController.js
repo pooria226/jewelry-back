@@ -52,14 +52,13 @@ module.exports.login = async (req, res) => {
   try {
     const { code, phone } = req.body;
     const { error } = loginValidator(req.body);
-    console.log("error", error);
     if (error) return res.status(401).json({ success: false, errors: error });
     const user = await User.findOne({ phone });
     const createdCode = new Date(user.created_code).getMinutes();
     const currentTime = new Date().getMinutes();
-    if (createdCode + 2 > currentTime) {
+    if (createdCode + 10 > currentTime) {
       if (code == user.code) {
-        const token = await createTokne(user._id);
+        const token = await createTokne(user.id);
         user.code = null;
         user.created_code = null;
         user.isVerifyd = true;

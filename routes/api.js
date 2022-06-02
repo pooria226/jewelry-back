@@ -10,6 +10,7 @@ const GalleryController = require("../app/Http/Controller/GalleryController");
 const AddressController = require("../app/Http/Controller/AddressController");
 const BlogController = require("../app/Http/Controller/BlogController");
 const ProductController = require("../app/Http/Controller/ProductController");
+const PaymentController = require("../app/Http/Controller/PaymentController");
 const { authentication } = require("../app/middleware/authentication");
 
 // Start Auth
@@ -20,6 +21,8 @@ router.post("/auth/login", AuthController.login);
 // Start User
 router.post("/user/current", authentication, UserController.currentUser);
 router.get("/user/profile", authentication, UserController.profile);
+router.post("/user/walet", authentication, UserController.walet);
+router.get("/user/walet/verify", UserController.verifyWalet);
 router.post("/user/profile", authentication, UserController.profileUpdate);
 router.post("/user/all", authentication, UserController.all);
 router.post("/user", authentication, UserController.store);
@@ -81,6 +84,10 @@ router.delete("/blog/:id", authentication, BlogController.delete);
 router.get("/product/all/:page", authentication, ProductController.all);
 router.post("/product", authentication, ProductController.store);
 // End Product
+
+// Start Payment
+router.get("/payment/all/:page", authentication, PaymentController.all);
+// End Payment
 
 // Start Contact
 router.get("/contact/all", authentication, ContactController.all);

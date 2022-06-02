@@ -5,7 +5,9 @@ module.exports.authentication = async (req, res, next) => {
   try {
     const token = req.headers.authorization.split("Bearer ")[1];
     const { id } = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findOne({ _id: id });
+    console.log("id", id);
+    const user = await User.findById(id);
+    console.log("user", user);
     req.user = user;
     next();
   } catch (error) {

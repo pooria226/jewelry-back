@@ -14,6 +14,10 @@ const storeValidator = (data) => {
       "any.required": `متن اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
+    image_origin: joi.string().required().messages({
+      "any.required": `عکس اصلی اجباری است`,
+      "string.empty": `باید رشته ای از حروف باشد`,
+    }),
     tags: joi.array().messages({
       "array.empty": `باید ارائه ای از برچسب ها باشد`,
     }),
@@ -67,6 +71,9 @@ const updateValidator = (data) => {
     }),
     slug: joi.string().messages({
       "any.required": `اسلاگ اجباری است`,
+      "string.empty": `باید رشته ای از حروف باشد`,
+    }),
+    image_origin: joi.string().messages({
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
     content: joi.string().messages({
