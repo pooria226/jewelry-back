@@ -39,6 +39,28 @@ module.exports.profile = async (req, res) => {
 };
 module.exports.profileUpdate = async (req, res) => {
   try {
+    const id = req.user.id;
+    const errors = updateValidator({ ...req.body, id: id });
+    if (errors.length > 0)
+      return res.status(400).json({ success: false, errors: errors });
+    const { first_name, last_name, code_meli, date_of_birth } = req.body;
+    const user = await User.findByIdAndUpdate(
+      id,
+      {
+        first_name,
+        last_name,
+        code_meli,
+        date_of_birth,
+      },
+      { omitUndefined: true, new: true }
+    );
+    res.status(200).json({ data: user, success: true });
+  } catch (error) {
+    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+  }
+};
+module.exports.avatarUpdate = async (req, res) => {
+  try {
     upload.uploadSingle(req, res, async (err) => {
       if (err) {
         return res.status(400).json({
@@ -55,18 +77,13 @@ module.exports.profileUpdate = async (req, res) => {
         const errors = updateValidator({ ...req.body, id: id });
         if (errors.length > 0)
           return res.status(400).json({ success: false, errors: errors });
-        const { first_name, last_name, code_meli, date_of_birth } = req.body;
         const origin = req.protocol + "://" + req.get("host");
         const user = await User.findByIdAndUpdate(
           id,
           {
-            first_name,
-            last_name,
             avatar: !isEmpty(req.file)
               ? origin + "/uploads/" + req.file.filename
               : undefined,
-            code_meli,
-            date_of_birth,
           },
           { omitUndefined: true, new: true }
         );
@@ -77,6 +94,7 @@ module.exports.profileUpdate = async (req, res) => {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }
 };
+
 module.exports.walet = async (req, res) => {
   try {
     const { amount } = req.body;
