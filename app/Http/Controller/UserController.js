@@ -111,7 +111,7 @@ module.exports.verifyWalet = async (req, res) => {
         Authority: authority,
       });
       if (result.status == -21) {
-        res.redirect("https://jewelry.iran.liara.run/");
+        res.redirect("http://localhost:3000/dashboard");
       } else {
         payment.ref_id = result.RefID;
         payment.success = true;
@@ -119,10 +119,10 @@ module.exports.verifyWalet = async (req, res) => {
         const user = await User.findById(payment.user);
         user.walet += parseInt(payment.amount || 0);
         await user.save();
-        res.redirect("https://jewelry.iran.liara.run/");
+        res.redirect("http://localhost:3000/dashboard");
       }
     } else {
-      res.redirect("https://jewelry.iran.liara.run/");
+      res.redirect("http://localhost:3000/dashboard");
     }
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
@@ -243,7 +243,7 @@ module.exports.verifyOrder = async (req, res) => {
         Authority: authority,
       });
       if (result.status == -21) {
-        res.redirect("https://jewelry.iran.liara.run/");
+        res.redirect("http://localhost:3000/dashboard");
       } else {
         payment.ref_id = result.RefID;
         payment.success = true;
@@ -252,10 +252,10 @@ module.exports.verifyOrder = async (req, res) => {
         order.pay = true;
         order.status = 1;
         await order.save();
-        res.redirect("https://jewelry.iran.liara.run/");
+        res.redirect("http://localhost:3000/dashboard");
       }
     } else {
-      res.redirect("https://jewelry.iran.liara.run/");
+      res.redirect("http://localhost:3000/dashboard");
     }
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
