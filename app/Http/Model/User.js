@@ -4,7 +4,7 @@ const user = new mongoose.Schema({
   first_name: { type: String, default: null },
   last_name: { type: String, default: null },
   phone: { type: String, required: true, unique: true },
-  avatar: { type: mongoose.Schema.Types.ObjectId, ref: "File" },
+  avatar: { type: String, default: null },
   role: {
     type: String,
     required: true,

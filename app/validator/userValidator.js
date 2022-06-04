@@ -56,10 +56,10 @@ const updateValidator = (data) => {
       "any.required": `شناسه یکتا اجباری است`,
     }),
     first_name: joi.string().messages({
-      "string.empty": `نام اجباری است`,
+      "string.empty": `نام باید رشته ای از حروف باشد`,
     }),
     last_name: joi.string().messages({
-      "string.empty": `باید رشته از حروف باشد`,
+      "string.empty": `نام خانوادگی باید رشته ای از حروف باشد`,
     }),
     phone: joi.string().min(11).max(11).messages({
       "string.empty": `باید رشته از حروف باشد`,
@@ -70,6 +70,12 @@ const updateValidator = (data) => {
       "string.empty": `باید رشته از حروف باشد`,
     }),
     avatar: joi.string().messages({
+      "string.empty": `باید رشته ای از حروف باشد`,
+    }),
+    code_meli: joi.string().messages({
+      "string.empty": `باید رشته ای از حروف باشد`,
+    }),
+    date_of_birth: joi.string().messages({
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
     isActive: joi.boolean(),

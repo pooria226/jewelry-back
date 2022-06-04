@@ -12,6 +12,7 @@ const {
 const { upload } = require("../../middleware/multer");
 const { isEmpty } = require("lodash");
 const Payment = require("../Model/Payment.js");
+const moment = require("moment");
 const zarinpal = ZarinpalCheckout.create(process.env.MERCHANTId, true);
 module.exports.currentUser = async (req, res) => {
   try {
@@ -26,9 +27,7 @@ module.exports.currentUser = async (req, res) => {
 };
 module.exports.profile = async (req, res) => {
   try {
-    const user = await User.findOne({ id: req.user.id }).select(
-      "-code -created_code"
-    );
+    const user = await User.findById(req.user.id).select("-code -created_code");
     res.status(200).json({
       success: true,
       data: user,
@@ -54,7 +53,9 @@ module.exports.profileUpdate = async (req, res) => {
       },
       { omitUndefined: true, new: true }
     );
-    res.status(200).json({ data: user, success: true });
+    res
+      .status(200)
+      .json({ data: user, message: "با موفقیت انجام شد", success: true });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }
@@ -74,20 +75,15 @@ module.exports.avatarUpdate = async (req, res) => {
         });
       } else {
         const id = req.user.id;
-        const errors = updateValidator({ ...req.body, id: id });
-        if (errors.length > 0)
-          return res.status(400).json({ success: false, errors: errors });
         const origin = req.protocol + "://" + req.get("host");
-        const user = await User.findByIdAndUpdate(
+        await User.findByIdAndUpdate(
           id,
           {
-            avatar: !isEmpty(req.file)
-              ? origin + "/uploads/" + req.file.filename
-              : undefined,
+            avatar: origin + "/uploads/" + req.file.filename || undefined,
           },
           { omitUndefined: true, new: true }
         );
-        res.status(200).json({ data: user, success: true });
+        res.status(200).json({ message: "با موفقیت انجام شد", success: true });
       }
     });
   } catch (error) {
@@ -100,7 +96,7 @@ module.exports.walet = async (req, res) => {
     const { amount } = req.body;
     const result = await zarinpal.PaymentRequest({
       Amount: amount,
-      CallbackURL: "https://jewelry-back.iran.liara.run/api/user/walet/verify",
+      CallbackURL: "http://localhost:3001/api/user/walet/verify",
       Description: "A Payment from jewelry",
       Mobile: req.user.phone,
     });
@@ -194,8 +190,7 @@ module.exports.ordersPay = async (req, res) => {
         amount = product_price - walet;
         const result = await zarinpal.PaymentRequest({
           Amount: amount,
-          CallbackURL:
-            "https://jewelry-back.iran.liara.run/api/user/orders/verify",
+          CallbackURL: "http://localhost:3001/api/user/orders/verify",
           Description: "A Payment from jewelry",
           Mobile: req.user.phone,
         });
@@ -227,8 +222,7 @@ module.exports.ordersPay = async (req, res) => {
       amount = product_price;
       const result = await zarinpal.PaymentRequest({
         Amount: amount,
-        CallbackURL:
-          "https://jewelry-back.iran.liara.run/api/user/orders/verify",
+        CallbackURL: "http://localhost:3001/api/user/orders/verify",
         Description: "A Payment from jewelry",
         Mobile: req.user.phone,
       });
