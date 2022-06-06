@@ -27,6 +27,13 @@ module.exports.store = async (req, res) => {
       recipient_lastname,
       recipient_phone,
     } = req.body;
+    const addresses = await Address.find();
+    if (addresses.length > 3) {
+      return res.status(400).json({
+        success: false,
+        message: "بیشتر از سه ادرس نمی توانید اضافه کنید",
+      });
+    }
     const errors = storeValidator(req.body);
     if (errors.length > 0)
       return res.status(400).json({ success: false, errors: errors });
@@ -89,8 +96,8 @@ module.exports.update = async (req, res) => {
     const errors = updateValidator({ ...req.body, id: id });
     if (errors.length > 0)
       return res.status(400).json({ success: false, errors: errors });
-    const dup_address = Address.findOne({ postal_code });
-    if (dup_address)
+    const dup_address = await Address.findOne({ postal_code });
+    if (dup_address && dup_address._id != id)
       return res.status(400).json({
         success: false,
         errors: [

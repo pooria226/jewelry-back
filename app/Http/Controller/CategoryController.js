@@ -23,7 +23,7 @@ module.exports.store = async (req, res) => {
     if (dupCategory)
       return res.status(400).json({
         success: false,
-        message: "دسته بندی ای با این عنوان دخیر شده است",
+        message: "دسته بندی ای با این عنوان ذخیره شده است",
       });
     await Category.create({ title, model, user: req.user.id, parent_id });
     res.status(200).json({ success: true, message: "با موفقیت انجام شد" });

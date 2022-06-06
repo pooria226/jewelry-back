@@ -35,9 +35,11 @@ const storeValidator = (data) => {
       "any.required": `نام خانوادگی گیرنده اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    recipient_phone: joi.string().required().messages({
+    recipient_phone: joi.string().required().min(11).max(11).messages({
       "any.required": `شماره تماس  گیرنده اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
+      "string.min": ` شماره تماس حداقل کارکتر باید یازده رقم باشد `,
+      "string.max": ` شماره تماس حداکثر کارکتر باید یازده رقم باشد`,
     }),
   });
   const { error } = schema.validate(data, { abortEarly: false });
@@ -77,40 +79,42 @@ const updateValidator = (data) => {
     }),
     postal_address: joi.string().messages({
       "any.required": `ادرس پستی اجباری است`,
-      "string.empty": `باید رشته ای از حروف باشد`,
+      "string.empty": `ادرس پستی باید رشته ای از حروف باشد`,
     }),
     province: joi.string().messages({
       "any.required": `استان اجباری است`,
-      "string.empty": `باید رشته ای از حروف باشد`,
+      "string.empty": `استان باید رشته ای از حروف باشد`,
     }),
     city: joi.string().messages({
       "any.required": `شهر اجباری است`,
-      "string.empty": `باید رشته ای از حروف باشد`,
+      "string.empty": `شهر باید رشته ای از حروف باشد`,
     }),
     plaque: joi.string().messages({
       "any.required": `پلاک اجباری است`,
-      "string.empty": `باید رشته ای از حروف باشد`,
+      "string.empty": `پلاک باید رشته ای از حروف باشد`,
     }),
     postal_code: joi.string().min(10).max(10).messages({
       "any.required": `کد پستی اجباری است`,
-      "string.empty": `باید رشته ای از حروف باشد`,
-      "string.min": `حداقل کارکتر باید ده رقم باشد`,
-      "string.max": `حداکثر کارکتر باید ده رقم باشد`,
+      "string.empty": `کد پستی باید رشته ای از حروف باشد`,
+      "string.min": `کد پستی حداقل کارکتر باید ده رقم باشد`,
+      "string.max": `کد پستی حداکثر کارکتر باید ده رقم باشد`,
     }),
     unit: joi.string().messages({
-      "string.empty": `باید رشته ای از حروف باشد`,
+      "string.empty": `واحد باید رشته ای از حروف باشد`,
     }),
     recipient_name: joi.string().messages({
       "any.required": `نام گیرنده اجباری است`,
-      "string.empty": `باید رشته ای از حروف باشد`,
+      "string.empty": `نام گیرنده باید رشته ای از حروف باشد`,
     }),
     recipient_lastname: joi.string().messages({
       "any.required": `نام خانوادگی گیرنده اجباری است`,
-      "string.empty": `باید رشته ای از حروف باشد`,
+      "string.empty": ` نام خانوادگی باید رشته ای از حروف باشد`,
     }),
-    recipient_phone: joi.string().messages({
+    recipient_phone: joi.string().min(11).max(11).messages({
       "any.required": `شماره تماس  گیرنده اجباری است`,
-      "string.empty": `باید رشته ای از حروف باشد`,
+      "string.empty": ` شماره تماس باید رشته ای از حروف باشد`,
+      "string.min": ` شماره تماس حداقل کارکتر باید یازده رقم باشد `,
+      "string.max": ` شماره تماس حداکثر کارکتر باید یازده رقم باشد`,
     }),
   });
   const { error } = schema.validate(data, { abortEarly: false });

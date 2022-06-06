@@ -22,9 +22,10 @@ module.exports.store = async (req, res) => {
       return res.status(400).json({ success: false, errors: errors });
     const dupTag = await Tag.findOne({ title });
     if (dupTag != null)
-      return res
-        .status(400)
-        .json({ success: false, message: "برچسبی با این عنوان ثبت شده است" });
+      return res.status(400).json({
+        success: false,
+        errors: [{ key: "title", message: "برچسبی با این عنوان ثبت شده است" }],
+      });
     await Tag.create({ title, user: req.user.id });
     res.status(200).json({ success: true, message: "با موفقیت انجام شد" });
   } catch (error) {
@@ -37,7 +38,7 @@ module.exports.show = async (req, res) => {
     const errors = showValidator(req.params);
     if (errors.length > 0)
       return res.status(400).json({ success: false, errors: errors });
-    const tag = await Tag.findOne({ id });
+    const tag = await Tag.findById(id);
     res.status(200).json({ success: true, data: tag });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
@@ -51,10 +52,11 @@ module.exports.update = async (req, res) => {
     if (errors.length > 0)
       return res.status(400).json({ success: false, errors: errors });
     const dupTag = await Tag.findOne({ title });
-    if (dupTag != null)
-      return res
-        .status(400)
-        .json({ success: false, message: "برچسبی با این عنوان ثبت شده است" });
+    if (dupTag && dupTag._id != id)
+      return res.status(400).json({
+        success: false,
+        errors: [{ key: "title", message: "برچسبی با این عنوان ثبت شده است" }],
+      });
     await Tag.findByIdAndUpdate(
       id,
       {
