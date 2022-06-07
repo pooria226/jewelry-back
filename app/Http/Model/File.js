@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const file = mongoose.Schema({
   name: { type: String, required: true },
+  original_name: { type: String, required: true },
   folder_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Folder",

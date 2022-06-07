@@ -7,12 +7,24 @@ module.exports.all = async (req, res) => {
   try {
     const { folder_id } = req.body;
     if (folder_id) {
-      const files = await File.find({ folder_id });
-      const folders = await Folder.find({ folder_id });
+      const files = await File.find({ folder_id }).populate({
+        path: "user",
+        select: "first_name last_name",
+      });
+      const folders = await Folder.find({ folder_id }).populate({
+        path: "user",
+        select: "first_name last_name",
+      });
       res.status(200).json({ success: true, data: { folders, files } });
     } else {
-      const files = await File.find({ folder_id: { $eq: null } });
-      const folders = await Folder.find({ folder_id: { $eq: null } });
+      const files = await File.find({ folder_id: { $eq: null } }).populate({
+        path: "user",
+        select: "first_name last_name",
+      });
+      const folders = await Folder.find({ folder_id: { $eq: null } }).populate({
+        path: "user",
+        select: "first_name last_name",
+      });
       res.status(200).json({ success: true, data: { files, folders } });
     }
   } catch (error) {
@@ -44,7 +56,12 @@ module.exports.storeFile = async (req, res) => {
         req?.files.map(async (item, index) => {
           console.log("item", item);
           const name = origin + "/uploads/" + item.filename;
-          await File.create({ name, folder_id });
+          await File.create({
+            name,
+            folder_id,
+            user: req.user._id,
+            original_name: item.originalname,
+          });
         });
         res.status(200).json({ success: true, message: "با موفقیت انجام شد" });
       }
@@ -73,7 +90,7 @@ module.exports.storeFolder = async (req, res) => {
           .status(400)
           .json({ success: false, data: "فولدری با این نام وجود دارد" });
     }
-    await Folder.create({ name, folder_id });
+    await Folder.create({ name, folder_id, user: req.user._id });
     res.status(200).json({ success: true, message: "با موفقیت انجام شد" });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
@@ -103,6 +120,7 @@ module.exports.updateFolder = async (req, res) => {
       folder_id,
       {
         name,
+        user: req.user._id,
         updated_at: Date.now(),
       },
       { omitUndefined: true, new: true }

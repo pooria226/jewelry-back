@@ -37,7 +37,7 @@ router.delete("/user/:id", authentication, UserController.delete);
 // End User
 
 // Start Tag
-router.get("/tag/all", authentication, TagController.all);
+router.get("/tag/all/:page", authentication, TagController.all);
 router.get("/tag/:id", authentication, TagController.show);
 router.post("/tag", authentication, TagController.store);
 router.put("/tag/:id", authentication, TagController.update);
