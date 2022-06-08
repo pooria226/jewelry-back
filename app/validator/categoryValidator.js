@@ -7,11 +7,7 @@ const storeValidator = (data) => {
       "any.required": `عنوان اجباری است`,
       "string.empty": `عنوان اجباری است`,
     }),
-    model: joi.string().required().messages({
-      "any.required": `model اجباری است`,
-      "string.empty": `model اجباری است`,
-    }),
-    parent_id: joi.string().required(),
+    parent_id: joi.string(),
   });
   const { error } = schema.validate(data, { abortEarly: false });
   const array = [];
@@ -52,10 +48,6 @@ const updateValidator = (data) => {
     }),
     title: joi.string().messages({
       "string.empty": `عنوان باید رشته ای از حروف باشد`,
-    }),
-    model: joi.string().messages({
-      "any.required": `model اجباری است`,
-      "string.empty": `model اجباری است`,
     }),
     parent_id: joi.string(),
   });

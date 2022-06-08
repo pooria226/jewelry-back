@@ -45,7 +45,7 @@ router.delete("/tag/:id", authentication, TagController.delete);
 // End Tag
 
 // Start Category
-router.get("/category/all", authentication, CategoryController.all);
+router.post("/category/all/:page", authentication, CategoryController.all);
 router.get("/category/:id", authentication, CategoryController.show);
 router.post("/category", authentication, CategoryController.store);
 router.put("/category/:id", authentication, CategoryController.update);
@@ -97,7 +97,7 @@ router.get("/payment/all/:page", authentication, PaymentController.all);
 // End Payment
 
 // Start Contact
-router.get("/contact/all", authentication, ContactController.all);
+router.get("/contact/all/:page", authentication, ContactController.all);
 router.get("/contact/:id", authentication, ContactController.show);
 router.post("/contact", ContactController.store);
 router.delete("/contact/:id", authentication, ContactController.delete);

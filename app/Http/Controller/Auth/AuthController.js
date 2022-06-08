@@ -23,7 +23,7 @@ module.exports.receive = async (req, res) => {
       );
       if (status == 200) {
         user.save();
-        res.status(200).json({
+        return res.status(200).json({
           message: "لطفا کد تایید را وارد کنید",
           success: true,
         });
@@ -38,14 +38,14 @@ module.exports.receive = async (req, res) => {
       );
       if (status == 200) {
         user.save();
-        res.status(200).json({
+        return res.status(200).json({
           message: "لطفا کد تایید را وارد کنید",
           success: true,
         });
       }
     }
   } catch (error) {
-    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+    return res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }
 };
 module.exports.login = async (req, res) => {
@@ -63,16 +63,16 @@ module.exports.login = async (req, res) => {
         user.created_code = null;
         user.isVerifyd = true;
         user.save();
-        res
+        return res
           .status(200)
           .json({ message: "خوش اومدی", success: true, token: token });
       } else {
-        res
+        return res
           .status(400)
           .json({ message: "کد فعال سازی منقضی شده است", success: false });
       }
     } else {
-      res
+      return res
         .status(400)
         .json({ message: "کد فعال سازی منقضی شده است", success: false });
     }

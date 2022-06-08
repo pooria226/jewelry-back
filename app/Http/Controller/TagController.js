@@ -23,22 +23,6 @@ module.exports.all = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "مشکلی پیش امده", success: false });
   }
-
-  // const { page } = req.params;
-  // const perPage = 10;
-  // try {
-  //   const blogs = await Blog.find()
-  //     .skip((page - 1) * perPage)
-  //     .limit(perPage)
-  //     .populate({ path: "tags", select: "id title" })
-  //     .populate({ path: "category" })
-  //     .sort({ create_at: 1 });
-  //   const blogs_count = await (await Blog.find()).length;
-  //   const pages = Math.ceil(blogs_count / perPage);
-  //   res.status(200).json({
-  //     data: { blogs, pages, count: blogs_count },
-  //     success: true,
-  //   });
 };
 module.exports.store = async (req, res) => {
   try {

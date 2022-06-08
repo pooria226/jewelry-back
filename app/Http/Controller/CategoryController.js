@@ -7,15 +7,44 @@ const Category = require("../Model/Category");
 
 module.exports.all = async (req, res) => {
   try {
-    const categories = await Category.find();
-    res.status(200).json({ success: true, data: categories });
+    const perPage = 12;
+    const { page } = req.params;
+    const { parent_id } = req.body;
+    if (parent_id) {
+      const categories = await Category.find({ parent_id })
+        .skip((page - 1) * perPage)
+        .populate({ path: "parent_id" })
+        .limit(perPage)
+        .sort({ create_at: 1 });
+      const categories_count = await (
+        await Category.find({ parent_id })
+      ).length;
+      const pages = Math.ceil(categories_count / perPage);
+      res.status(200).json({
+        data: { categories, pages, count: categories_count, category: false },
+        success: true,
+      });
+    } else {
+      const categories = await Category.find({ parent_id: { $eq: null } })
+        .skip((page - 1) * perPage)
+        .limit(perPage)
+        .sort({ create_at: 1 });
+      const categories_count = await (
+        await Category.find({ parent_id: { $eq: null } })
+      ).length;
+      const pages = Math.ceil(categories_count / perPage);
+      res.status(200).json({
+        data: { categories, pages, count: categories_count, category: true },
+        success: true,
+      });
+    }
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }
 };
 module.exports.store = async (req, res) => {
   try {
-    const { title, model, parent_id } = req.body;
+    const { title, parent_id } = req.body;
     const errors = storeValidator(req.body);
     if (errors.length > 0)
       return res.status(400).json({ success: false, errors: errors });
@@ -23,9 +52,14 @@ module.exports.store = async (req, res) => {
     if (dupCategory)
       return res.status(400).json({
         success: false,
-        message: "دسته بندی ای با این عنوان ذخیره شده است",
+        errors: [
+          {
+            key: "title",
+            message: "دسته بندی ای با این عنوان ذخیره شده است",
+          },
+        ],
       });
-    await Category.create({ title, model, user: req.user.id, parent_id });
+    await Category.create({ title, user: req.user._id, parent_id });
     res.status(200).json({ success: true, message: "با موفقیت انجام شد" });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
@@ -43,10 +77,11 @@ module.exports.show = async (req, res) => {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }
 };
+
 module.exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, model } = req.body;
+    const { title } = req.body;
     const errors = updateValidator({ ...req.body, id: id });
     if (errors.length > 0)
       return res.status(400).json({ success: false, errors: errors });
@@ -54,7 +89,6 @@ module.exports.update = async (req, res) => {
       id,
       {
         title,
-        model,
         updated_at: Date.now(),
       },
       { omitUndefined: true, new: true }
@@ -71,6 +105,10 @@ module.exports.delete = async (req, res) => {
     if (errors.length > 0)
       return res.status(400).json({ success: false, errors: errors });
     await Category.findByIdAndRemove(id);
+    const categories = await Category.find({ parent_id: id });
+    categories.map(async (item) => {
+      await Category.findByIdAndRemove(item._id);
+    });
     res.status(200).json({ success: true, message: "با موفقیت انجام شد" });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
