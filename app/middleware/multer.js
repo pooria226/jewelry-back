@@ -1,8 +1,7 @@
 const multer = require("multer");
 const uuid = require("uuid").v4;
-const appRoot = require("app-root-path");
 const storage = multer.diskStorage({
-  destination: appRoot + "/public/uploads",
+  destination: "./public/uploads/",
   filename: function (_req, file, cb) {
     cb(null, uuid() + "-" + file.originalname);
   },
