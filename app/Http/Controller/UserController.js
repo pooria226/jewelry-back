@@ -63,6 +63,7 @@ module.exports.profileUpdate = async (req, res) => {
 module.exports.avatarUpdate = async (req, res) => {
   try {
     upload.uploadSingle(req, res, async (err) => {
+      console.log("err", err);
       if (err) {
         return res.status(400).json({
           success: false,
