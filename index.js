@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const app = express();
 const apiRoutes = require("./routes/api");
-const appRoot = require("app-root-path");
+const path = require("path");
 require("dotenv").config();
 class Application {
   constructor() {
@@ -17,7 +17,7 @@ class Application {
     // built-in middleware
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
-    app.use(express.static(appRoot + "public"));
+    app.use(express.static(path.join(__dirname, "public")));
     //routes
     app.use("/api", apiRoutes);
   }
