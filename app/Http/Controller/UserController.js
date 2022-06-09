@@ -97,7 +97,7 @@ module.exports.walet = async (req, res) => {
     const { amount } = req.body;
     const result = await zarinpal.PaymentRequest({
       Amount: amount,
-      CallbackURL: "https://jewelry.iran.liara.run/api/user/walet/verify",
+      CallbackURL: "https://jewelry-back.iran.liara.run/api/user/walet/verify",
       Description: "A Payment from jewelry",
       Mobile: req.user.phone,
     });
@@ -191,7 +191,8 @@ module.exports.ordersPay = async (req, res) => {
         amount = product_price - walet;
         const result = await zarinpal.PaymentRequest({
           Amount: amount,
-          CallbackURL: "https://jewelry.iran.liara.run/api/user/orders/verify",
+          CallbackURL:
+            "https://jewelry-back.iran.liara.run/api/user/orders/verify",
           Description: "A Payment from jewelry",
           Mobile: req.user.phone,
         });
