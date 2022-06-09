@@ -30,8 +30,9 @@ module.exports.store = async (req, res) => {
     } = req.body;
     const errors = storeValidator(req.body);
     if (errors.length > 0)
-      return res.status(200).json({ errors: errors, success: false });
-    const image = await File.findById(avatar);
+      return res.status(400).json({ errors: errors, success: false });
+    const image = await File.findOne({ id: avatar });
+    console.log("req.body", req.body);
     await Team.create({
       first_name,
       last_name,
@@ -40,10 +41,11 @@ module.exports.store = async (req, res) => {
       telegram,
       whatsapp,
       instagram,
-      avatar: image.name || null,
+      avatar: image.name,
     });
     res.status(200).json({ message: "با  موفقیت انجام شد", success: true });
   } catch (error) {
+    console.log(error);
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }
 };
