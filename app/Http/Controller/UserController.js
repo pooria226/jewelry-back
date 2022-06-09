@@ -97,7 +97,7 @@ module.exports.walet = async (req, res) => {
     const { amount } = req.body;
     const result = await zarinpal.PaymentRequest({
       Amount: amount,
-      CallbackURL: "http://localhost:3001/api/user/walet/verify",
+      CallbackURL: "https://jewelry.iran.liara.run/api/user/walet/verify",
       Description: "A Payment from jewelry",
       Mobile: req.user.phone,
     });
@@ -126,7 +126,7 @@ module.exports.verifyWalet = async (req, res) => {
         Authority: authority,
       });
       if (result.status == -21) {
-        res.redirect("http://localhost:3000/dashboard");
+        res.redirect("https://jewelry.iran.liara.run/dashboard");
       } else {
         payment.ref_id = result.RefID;
         payment.success = true;
@@ -134,10 +134,10 @@ module.exports.verifyWalet = async (req, res) => {
         const user = await User.findById(payment.user);
         user.walet += parseInt(payment.amount || 0);
         await user.save();
-        res.redirect("http://localhost:3000/dashboard");
+        res.redirect("https://jewelry.iran.liara.run/dashboard");
       }
     } else {
-      res.redirect("http://localhost:3000/dashboard");
+      res.redirect("https://jewelry.iran.liara.run/dashboard");
     }
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
@@ -191,7 +191,7 @@ module.exports.ordersPay = async (req, res) => {
         amount = product_price - walet;
         const result = await zarinpal.PaymentRequest({
           Amount: amount,
-          CallbackURL: "http://localhost:3001/api/user/orders/verify",
+          CallbackURL: "https://jewelry.iran.liara.run/api/user/orders/verify",
           Description: "A Payment from jewelry",
           Mobile: req.user.phone,
         });
@@ -223,7 +223,7 @@ module.exports.ordersPay = async (req, res) => {
       amount = product_price;
       const result = await zarinpal.PaymentRequest({
         Amount: amount,
-        CallbackURL: "http://localhost:3001/api/user/orders/verify",
+        CallbackURL: "https://jewelry.iran.liara.run/api/user/orders/verify",
         Description: "A Payment from jewelry",
         Mobile: req.user.phone,
       });
@@ -256,7 +256,7 @@ module.exports.verifyOrder = async (req, res) => {
         Authority: authority,
       });
       if (result.status == -21) {
-        res.redirect("http://localhost:3000/dashboard");
+        res.redirect("https://jewelry.iran.liara.run/dashboard");
       } else {
         payment.ref_id = result.RefID;
         payment.success = true;
@@ -265,10 +265,10 @@ module.exports.verifyOrder = async (req, res) => {
         order.pay = true;
         order.status = 1;
         await order.save();
-        res.redirect("http://localhost:3000/dashboard");
+        res.redirect("https://jewelry.iran.liara.run/dashboard");
       }
     } else {
-      res.redirect("http://localhost:3000/dashboard");
+      res.redirect("https://jewelry.iran.liara.run/dashboard");
     }
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
