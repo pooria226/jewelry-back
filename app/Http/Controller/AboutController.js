@@ -43,6 +43,7 @@ module.exports.store = async (req, res) => {
       instagram,
       avatar: image.name,
     });
+
     res.status(200).json({ message: "با  موفقیت انجام شد", success: true });
   } catch (error) {
     console.log(error);
