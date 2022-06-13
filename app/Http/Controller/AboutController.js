@@ -57,6 +57,7 @@ module.exports.show = async (req, res) => {
     if (errors.length > 0)
       return res.status(401).json({ success: false, errors: errors });
     const team = await Team.findById(id);
+
     res.status(200).json({ data: team, success: true });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
