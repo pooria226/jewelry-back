@@ -34,7 +34,6 @@ module.exports.all = async (req, res) => {
 module.exports.storeFile = async (req, res) => {
   try {
     upload.uploadArray(req, res, async (err) => {
-      console.log("req.files", req.files);
       if (err) {
         return res.status(400).json({
           success: false,
@@ -54,7 +53,6 @@ module.exports.storeFile = async (req, res) => {
             errors: [{ key: "file", message: "فایلی اپلود نشد" }],
           });
         req?.files.map(async (item, index) => {
-          console.log("item", item);
           const name = origin + "/uploads/" + item.filename;
           await File.create({
             name,

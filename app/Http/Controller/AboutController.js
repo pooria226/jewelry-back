@@ -31,8 +31,8 @@ module.exports.store = async (req, res) => {
     const errors = storeValidator(req.body);
     if (errors.length > 0)
       return res.status(400).json({ errors: errors, success: false });
-    const image = await File.findOne({ id: avatar });
-    console.log("req.body", req.body);
+    const image = await File.findById(avatar);
+
     await Team.create({
       first_name,
       last_name,
@@ -55,7 +55,7 @@ module.exports.show = async (req, res) => {
     const errors = showValidator(req.params);
     if (errors.length > 0)
       return res.status(401).json({ success: false, errors: errors });
-    const team = await Team.findOne({ id });
+    const team = await Team.findById(id);
     res.status(200).json({ data: team, success: true });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
@@ -76,7 +76,7 @@ module.exports.update = async (req, res) => {
     } = req.body;
     const errors = updateValidator({ ...req.body, id: id });
     if (errors.length > 0)
-      return res.status(401).json({ success: false, errors: errors });
+      return res.status(400).json({ success: false, errors: errors });
     const image = await File.findById(avatar);
     await Team.findByIdAndUpdate(
       id,
@@ -88,7 +88,7 @@ module.exports.update = async (req, res) => {
         telegram,
         whatsapp,
         instagram,
-        avatar: image.name || undefined,
+        avatar: image?.name || undefined,
         updated_at: Date.now(),
       },
       { omitUndefined: true, new: true }

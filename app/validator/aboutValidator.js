@@ -14,8 +14,9 @@ const storeValidator = (data) => {
       "any.required": `صمت اجباری است`,
       "string.empty": `صمت باید رشته ای از حروف باشد`,
     }),
-    email: joi.string().messages({
+    email: joi.string().email().messages({
       "string.empty": `باید رشته ای از حروف باشد`,
+      "string.email": `ایمیل باید معتبر باشد`,
     }),
     telegram: joi.string().messages({
       "string.empty": `ادرس تلگرام باید رشته ای از حروف باشد`,
@@ -32,6 +33,7 @@ const storeValidator = (data) => {
     }),
   });
   const { error } = schema.validate(data, { abortEarly: false });
+  console.log(error);
   const array = [];
   if (error) {
     error.details.map((item, index) => {
@@ -78,8 +80,9 @@ const updateValidator = (data) => {
       "any.required": `متن پیام اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    email: joi.string().messages({
+    email: joi.string().email().messages({
       "string.empty": `باید رشته ای از حروف باشد`,
+      "string.email": `ایمیل باید معتبر باشد`,
     }),
     telegram: joi.string().messages({
       "string.empty": `باید رشته ای از حروف باشد`,
