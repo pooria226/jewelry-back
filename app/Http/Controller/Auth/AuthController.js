@@ -26,6 +26,7 @@ module.exports.receive = async (req, res) => {
         return res.status(200).json({
           message: "لطفا کد تایید را وارد کنید",
           success: true,
+          code: code,
         });
       }
     } else {
@@ -41,6 +42,7 @@ module.exports.receive = async (req, res) => {
         return res.status(200).json({
           message: "لطفا کد تایید را وارد کنید",
           success: true,
+          code: code,
         });
       }
     }

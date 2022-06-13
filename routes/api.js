@@ -29,7 +29,7 @@ router.get("/user/orders/verify", UserController.verifyOrder);
 router.post("/user/orders", authentication, UserController.ordersStore);
 router.post("/user/profile", authentication, UserController.profileUpdate);
 router.post("/user/avatar", authentication, UserController.avatarUpdate);
-router.post("/user/all", authentication, UserController.all);
+router.post("/user/all/:page", authentication, UserController.all);
 router.post("/user", authentication, UserController.store);
 router.get("/user/:id", authentication, UserController.show);
 router.put("/user/:id", authentication, UserController.update);

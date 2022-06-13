@@ -10,9 +10,7 @@ const {
   orderStoreValidator,
 } = require("../../validator/userValidator");
 const { upload } = require("../../middleware/multer");
-const { isEmpty } = require("lodash");
 const Payment = require("../Model/Payment.js");
-const moment = require("moment");
 const zarinpal = ZarinpalCheckout.create(process.env.MERCHANTId, true);
 module.exports.currentUser = async (req, res) => {
   try {
@@ -91,7 +89,6 @@ module.exports.avatarUpdate = async (req, res) => {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }
 };
-
 module.exports.walet = async (req, res) => {
   try {
     const { amount } = req.body;
@@ -276,14 +273,44 @@ module.exports.verifyOrder = async (req, res) => {
   }
 };
 module.exports.all = async (req, res) => {
+  // const { page } = req.params;
+  // const perPage = 12;
+  // const tags = await Tag.find()
+  //   .skip((page - 1) * perPage)
+  //   .limit(perPage)
+  //   .sort({ create_at: 1 });
+  // const tags_count = await (await Tag.find()).length;
+  // const pages = Math.ceil(tags_count / perPage);
+  // res.status(200).json({
+  //   data: { tags, pages, count: tags_count },
+  //   success: true,
+  // });
   try {
+    const { page } = req.params;
+    const perPage = 12;
     const { role } = req.body;
     if (role != undefined) {
-      const users = await User.find({ role }).select("-code -created_code");
-      res.status(200).json({ success: true, data: users });
+      const users = await User.find({ role })
+        .skip((page - 1) * perPage)
+        .limit(perPage)
+        .sort({ create_at: 1 })
+        .select("-code -created_code");
+      const users_count = await (await User.find({ role })).length;
+      const pages = Math.ceil(users_count / perPage);
+      res
+        .status(200)
+        .json({ success: true, data: { users, pages, count: users_count } });
     } else {
-      const users = await User.find().select("-code -created_code");
-      res.status(200).json({ success: true, data: users });
+      const users = await User.find()
+        .skip((page - 1) * perPage)
+        .limit(perPage)
+        .sort({ create_at: 1 })
+        .select("-code -created_code");
+      const users_count = await (await User.find()).length;
+      const pages = Math.ceil(users_count / perPage);
+      res
+        .status(200)
+        .json({ success: true, data: { users, pages, count: users_count } });
     }
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
