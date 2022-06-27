@@ -273,18 +273,6 @@ module.exports.verifyOrder = async (req, res) => {
   }
 };
 module.exports.all = async (req, res) => {
-  // const { page } = req.params;
-  // const perPage = 12;
-  // const tags = await Tag.find()
-  //   .skip((page - 1) * perPage)
-  //   .limit(perPage)
-  //   .sort({ create_at: 1 });
-  // const tags_count = await (await Tag.find()).length;
-  // const pages = Math.ceil(tags_count / perPage);
-  // res.status(200).json({
-  //   data: { tags, pages, count: tags_count },
-  //   success: true,
-  // });
   try {
     const { page } = req.params;
     const perPage = 12;
@@ -322,7 +310,7 @@ module.exports.show = async (req, res) => {
     const errors = showValidator(req.params);
     if (errors.length > 0)
       return res.status(400).json({ success: false, errors: errors });
-    const user = await User.findOne({ id });
+    const user = await User.findById(id);
     res.status(200).json({ data: user, success: true });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
@@ -361,7 +349,7 @@ module.exports.store = async (req, res) => {
       last_name,
       phone,
       role,
-      avatar: image.name || null,
+      avatar: image?.name || null,
       code_meli,
       isVerifyd,
       isActive,
@@ -393,7 +381,7 @@ module.exports.update = async (req, res) => {
       avatar,
     } = req.body;
     const image = await File.findById(avatar);
-    const user = await User.findByIdAndUpdate(
+    await User.findByIdAndUpdate(
       id,
       {
         first_name,
@@ -402,14 +390,16 @@ module.exports.update = async (req, res) => {
         role,
         isVerifyd,
         isActive,
-        avatar: image.name || undefined,
+        avatar: image?.name || undefined,
         code_meli,
         date_of_birth,
         updated_at: Date.now(),
       },
       { omitUndefined: true, new: true }
     );
-    res.status(200).json({ data: user, success: true });
+    res
+      .status(200)
+      .json({ message: "کاربر با موفقیت اضافه شد", success: true });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }

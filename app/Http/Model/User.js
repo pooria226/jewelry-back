@@ -5,11 +5,12 @@ const user = new mongoose.Schema({
   last_name: { type: String, default: null },
   phone: { type: String, required: true, unique: true },
   avatar: { type: String, default: null },
+  favorite_product: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
   role: {
     type: String,
     required: true,
     default: "user",
-    enum: ["admin", "user", "bloger"],
+    enum: ["admin", "user", "bloger", "teammate"],
   },
   code_meli: { type: String, default: null },
   date_of_birth: { type: String, default: null },

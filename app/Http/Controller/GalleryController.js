@@ -35,6 +35,7 @@ module.exports.storeFile = async (req, res) => {
   try {
     upload.uploadArray(req, res, async (err) => {
       if (err) {
+        console.log(err);
         return res.status(400).json({
           success: false,
           errors: [

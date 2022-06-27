@@ -7,16 +7,13 @@ const blog = mongoose.Schema({
   isPublished: { type: Boolean, default: false },
   like: { type: Number, default: 0 },
   view: { type: Number, default: 0 },
-  image_origin: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "File",
-    require: true,
-  },
+  image_origin: { type: String, require: true },
   tags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tag" }],
   category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "comment" }],
   author: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   user_like: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  published_at: { type: Date, default: null },
   created_at: { type: Date, default: Date.now() },
   updated_at: { type: Date, default: null },
 });

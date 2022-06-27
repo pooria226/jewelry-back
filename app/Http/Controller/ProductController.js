@@ -44,17 +44,17 @@ module.exports.store = async (req, res) => {
     const {
       title,
       slug,
-      carat,
       price,
       weight,
       category,
       image_origin,
       images,
+      description,
     } = req.body;
     const errors = storeValidator(req.body);
     if (errors.length > 0)
       return res.status(401).json({ success: false, errors: errors });
-
+    const image = await File.findById(image_origin);
     await Product.create({
       title,
       slug,
@@ -62,8 +62,9 @@ module.exports.store = async (req, res) => {
       weight,
       category,
       image_origin,
+      description,
       images: images,
-      carat,
+      image_origin: image?.name || undefined,
     });
     res.status(200).json({ success: true, message: "با موفقیت ثبت شد" });
   } catch (error) {
@@ -73,16 +74,8 @@ module.exports.store = async (req, res) => {
 module.exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const {
-      title,
-      slug,
-      carat,
-      price,
-      weight,
-      category,
-      image_origin,
-      images,
-    } = req.body;
+    const { title, slug, price, weight, category, image_origin, images } =
+      req.body;
     const errors = updateValidator({ ...req.body, id: id });
     if (errors.length > 0)
       return res.status(401).json({ success: false, errors: errors });
@@ -91,7 +84,6 @@ module.exports.update = async (req, res) => {
       {
         title,
         slug,
-        carat,
         price,
         weight,
         category,

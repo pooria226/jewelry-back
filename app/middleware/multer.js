@@ -14,9 +14,6 @@ var uploadSingle = multer({
 }).single("image");
 var uploadArray = multer({
   storage: storage,
-  fileFilter: function (_req, file, cb) {
-    checkFileType(file, cb);
-  },
 }).array("images");
 
 function checkFileType(file, cb) {

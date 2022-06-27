@@ -21,14 +21,20 @@ module.exports.receive = async (req, res) => {
         `کد تایید شما ${code}`,
         user.phone
       );
-      if (status == 200) {
-        user.save();
-        return res.status(200).json({
-          message: "لطفا کد تایید را وارد کنید",
-          success: true,
-          code: code,
-        });
-      }
+      user.save();
+      return res.status(200).json({
+        message: "لطفا کد تایید را وارد کنید",
+        success: true,
+        code: code,
+      });
+      // if (status == 200) {
+      //   user.save();
+      //   return res.status(200).json({
+      //     message: "لطفا کد تایید را وارد کنید",
+      //     success: true,
+      //     code: code,
+      //   });
+      // }
     } else {
       const code = codeGenerator();
       user.code = code;
@@ -37,14 +43,20 @@ module.exports.receive = async (req, res) => {
         `کد تایید شما ${code}`,
         user.phone
       );
-      if (status == 200) {
-        user.save();
-        return res.status(200).json({
-          message: "لطفا کد تایید را وارد کنید",
-          success: true,
-          code: code,
-        });
-      }
+      user.save();
+      return res.status(200).json({
+        message: "لطفا کد تایید را وارد کنید",
+        success: true,
+        code: code,
+      });
+      // if (status == 200) {
+      //   user.save();
+      //   return res.status(200).json({
+      //     message: "لطفا کد تایید را وارد کنید",
+      //     success: true,
+      //     code: code,
+      //   });
+      // }
     }
   } catch (error) {
     return res.status(400).json({ message: "مشکلی پیش امده", success: false });

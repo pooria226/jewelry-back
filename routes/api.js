@@ -11,6 +11,7 @@ const AddressController = require("../app/Http/Controller/AddressController");
 const BlogController = require("../app/Http/Controller/BlogController");
 const ProductController = require("../app/Http/Controller/ProductController");
 const PaymentController = require("../app/Http/Controller/PaymentController");
+const SliderController = require("../app/Http/Controller/SliderController");
 const { authentication } = require("../app/middleware/authentication");
 
 // Start Auth
@@ -79,10 +80,14 @@ router.delete("/address/:id", authentication, AddressController.delete);
 
 // Start Blog
 router.get("/blog/all/:page", authentication, BlogController.all);
+router.get("/blog/category", authentication, BlogController.category);
+router.get("/blog/tag", authentication, BlogController.tag);
 router.post("/blog", authentication, BlogController.store);
 router.get("/blog/:id", authentication, BlogController.show);
 router.put("/blog/:id", authentication, BlogController.update);
 router.delete("/blog/:id", authentication, BlogController.delete);
+router.delete("/blog/publish/:id", authentication, BlogController.publish);
+router.delete("/blog/unpublish/:id", authentication, BlogController.unPublish);
 // End Blog
 
 // Start Product
@@ -91,6 +96,12 @@ router.get("/product/:id", authentication, ProductController.show);
 router.post("/product", authentication, ProductController.store);
 router.put("/product/:id", authentication, ProductController.update);
 // End Product
+
+// Start slider
+router.post("/slider/all", authentication, SliderController.all);
+router.post("/slider", authentication, SliderController.store);
+router.delete("/slider/:id", authentication, SliderController.delete);
+// End slider
 
 // Start Payment
 router.get("/payment/all/:page", authentication, PaymentController.all);

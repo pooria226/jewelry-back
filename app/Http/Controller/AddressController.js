@@ -8,7 +8,8 @@ const Address = require("../Model/Address");
 
 module.exports.all = async (req, res) => {
   try {
-    const addresses = await Address.find();
+    const addresses = await Address.find({ user: req.user._id });
+    console.log("addresses", addresses);
     res.status(200).json({ success: true, data: addresses });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
