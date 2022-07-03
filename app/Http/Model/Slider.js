@@ -2,9 +2,10 @@ const mongoose = require("mongoose");
 
 const slider = new mongoose.Schema({
   image: { type: String, required: true },
+  link: { type: String, default: null },
   position: {
     type: String,
-    enum: ["homeSlider", "homeLaser"],
+    enum: ["homeSlider", "homeLaser", "homeBanner"],
   },
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   created_at: { type: Date, default: Date.now() },

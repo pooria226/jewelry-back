@@ -12,6 +12,7 @@ const BlogController = require("../app/Http/Controller/BlogController");
 const ProductController = require("../app/Http/Controller/ProductController");
 const PaymentController = require("../app/Http/Controller/PaymentController");
 const SliderController = require("../app/Http/Controller/SliderController");
+const HomeController = require("../app/Http/Controller/website/HomeController");
 const { authentication } = require("../app/middleware/authentication");
 
 // Start Auth
@@ -35,6 +36,7 @@ router.post("/user", authentication, UserController.store);
 router.get("/user/:id", authentication, UserController.show);
 router.put("/user/:id", authentication, UserController.update);
 router.delete("/user/:id", authentication, UserController.delete);
+router.post("/user/search/:page", authentication, UserController.search);
 // End User
 
 // Start Tag
@@ -82,24 +84,40 @@ router.delete("/address/:id", authentication, AddressController.delete);
 router.get("/blog/all/:page", authentication, BlogController.all);
 router.get("/blog/category", authentication, BlogController.category);
 router.get("/blog/tag", authentication, BlogController.tag);
+router.get("/blog/bloger", authentication, BlogController.userBloger);
+router.post("/blog/search/:page", authentication, BlogController.search);
 router.post("/blog", authentication, BlogController.store);
 router.get("/blog/:id", authentication, BlogController.show);
 router.put("/blog/:id", authentication, BlogController.update);
 router.delete("/blog/:id", authentication, BlogController.delete);
-router.delete("/blog/publish/:id", authentication, BlogController.publish);
-router.delete("/blog/unpublish/:id", authentication, BlogController.unPublish);
+router.get("/blog/publish/:id", authentication, BlogController.publish);
+router.get("/blog/unpublish/:id", authentication, BlogController.unPublish);
 // End Blog
 
 // Start Product
 router.get("/product/all/:page", authentication, ProductController.all);
+router.get(
+  "/product/correction",
+  authentication,
+  ProductController.priceCorrecdddtion
+);
 router.get("/product/:id", authentication, ProductController.show);
 router.post("/product", authentication, ProductController.store);
 router.put("/product/:id", authentication, ProductController.update);
+router.delete("/product/:id", authentication, ProductController.delete);
+router.get("/product/publish/:id", authentication, ProductController.publish);
+router.get(
+  "/product/unpublish/:id",
+  authentication,
+  ProductController.unPublish
+);
 // End Product
 
 // Start slider
 router.post("/slider/all", authentication, SliderController.all);
 router.post("/slider", authentication, SliderController.store);
+router.get("/slider/:id", authentication, SliderController.show);
+router.put("/slider/:id", authentication, SliderController.update);
 router.delete("/slider/:id", authentication, SliderController.delete);
 // End slider
 
@@ -121,5 +139,15 @@ router.get("/about/team/:id", authentication, AboutController.show);
 router.put("/about/team/:id", authentication, AboutController.update);
 router.delete("/about/team/:id", authentication, AboutController.delete);
 // End about
+
+//**********************************************************  Start website
+// Start home
+router.get("/home/slider", HomeController.all);
+// end home
+
+// Start about
+router.get("/about-us/team", AboutController.team);
+// end about
+//********************************************************* End website
 
 module.exports = router;

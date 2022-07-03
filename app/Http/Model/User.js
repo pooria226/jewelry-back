@@ -3,7 +3,13 @@ const mongoose = require("mongoose");
 const user = new mongoose.Schema({
   first_name: { type: String, default: null },
   last_name: { type: String, default: null },
-  phone: { type: String, required: true, unique: true },
+  fullname: {
+    type: String,
+    default: function () {
+      return this.first_name + " " + this.last_name;
+    },
+  },
+  phone: { type: String, required: true, unique: true, min: 11, max: 11 },
   avatar: { type: String, default: null },
   favorite_product: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
   role: {

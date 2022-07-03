@@ -1,5 +1,6 @@
 const Blog = require("../Model/Blog");
 const File = require("../Model/File");
+const User = require("../Model/User");
 const {
   storeValidator,
   showValidator,
@@ -11,7 +12,7 @@ const Tag = require("../Model/Tag");
 
 module.exports.all = async (req, res) => {
   const { page } = req.params;
-  const perPage = 10;
+  const perPage = 12;
   try {
     const blogs = await Blog.find()
       .skip((page - 1) * perPage)
@@ -33,8 +34,17 @@ module.exports.all = async (req, res) => {
 
 module.exports.store = async (req, res) => {
   try {
-    const { title, slug, content, tags, category, image_origin, like, view } =
-      req.body;
+    const {
+      title,
+      slug,
+      content,
+      tags,
+      category,
+      image_origin,
+      like,
+      view,
+      author,
+    } = req.body;
     const errors = storeValidator(req.body);
     if (errors.length > 0)
       return res.status(400).json({ errors: errors, success: false });
@@ -45,13 +55,17 @@ module.exports.store = async (req, res) => {
         success: false,
       });
     const image = await File.findById(image_origin);
+    const authorUser = await User.findById(author);
     await Blog.create({
       title,
       slug,
       content,
       tags,
       category,
-      author: req.user.id,
+      author: {
+        _id: authorUser?._id,
+        fullname: authorUser?.first_name + " " + authorUser?.last_name,
+      },
       like,
       view,
       image_origin: image?.name || undefined,
@@ -94,6 +108,7 @@ module.exports.update = async (req, res) => {
     if (errors.length > 0)
       return res.status(400).json({ success: false, errors: errors });
     const image = await File.findById(image_origin);
+    const authorUser = await User.findById(author);
     await Blog.findByIdAndUpdate(
       id,
       {
@@ -102,7 +117,10 @@ module.exports.update = async (req, res) => {
         content,
         tags,
         category,
-        author,
+        author: {
+          _id: authorUser?._id,
+          fullname: authorUser?.first_name + " " + authorUser?.last_name,
+        },
         like,
         view,
         image_origin: image?.name || undefined,
@@ -132,7 +150,7 @@ module.exports.delete = async (req, res) => {
 };
 module.exports.category = async (req, res) => {
   try {
-    const categories = await Category.find({ parent_id: { $ne: null } });
+    const categories = await Category.find();
     return res.status(200).json({ data: categories, success: true });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
@@ -180,6 +198,39 @@ module.exports.unPublish = async (req, res) => {
       success: true,
       message: "با موفقیت انجام شد",
     });
+  } catch (error) {
+    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+  }
+};
+module.exports.userBloger = async (req, res) => {
+  try {
+    const users = await User.find({ role: "bloger" });
+    return res.status(200).json({
+      data: users,
+      success: true,
+    });
+  } catch (error) {
+    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+  }
+};
+module.exports.search = async (req, res) => {
+  try {
+    const { page } = req.params;
+    const { query } = req.body;
+    const perPage = 12;
+    const regex = new RegExp(query, "i");
+    const blogs = await Blog.find({ title: { $regex: regex } })
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .sort({ create_at: 1 })
+      .select("-code -created_code");
+    const blogs_count = await (
+      await Blog.find({ title: { $regex: regex } })
+    ).length;
+    const pages = Math.ceil(blogs_count / perPage);
+    res
+      .status(200)
+      .json({ success: true, data: { blogs, pages, count: blogs_count } });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }

@@ -112,3 +112,11 @@ module.exports.delete = async (req, res) => {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }
 };
+module.exports.team = async (req, res) => {
+  try {
+    const teams = await Team.find();
+    res.status(200).json({ data: teams, success: true });
+  } catch (error) {
+    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+  }
+};

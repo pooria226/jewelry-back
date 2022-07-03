@@ -349,7 +349,7 @@ module.exports.store = async (req, res) => {
       last_name,
       phone,
       role,
-      avatar: image?.name || null,
+      avatar: image?.name || undefined,
       code_meli,
       isVerifyd,
       isActive,
@@ -415,6 +415,28 @@ module.exports.delete = async (req, res) => {
       success: true,
       message: "کاربر با موفقیت حذف شد",
     });
+  } catch (error) {
+    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+  }
+};
+module.exports.search = async (req, res) => {
+  try {
+    const { page } = req.params;
+    const { query } = req.body;
+    const perPage = 12;
+    const regex = new RegExp(query, "i");
+    const users = await User.find({ fullname: { $regex: regex } })
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .sort({ create_at: 1 })
+      .select("-code -created_code");
+    const users_count = await (
+      await User.find({ fullname: { $regex: regex } })
+    ).length;
+    const pages = Math.ceil(users_count / perPage);
+    res
+      .status(200)
+      .json({ success: true, data: { users, pages, count: users_count } });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }

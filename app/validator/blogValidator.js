@@ -24,14 +24,14 @@ const storeValidator = (data) => {
     category: joi.string().messages({
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    author: joi.string().messages({
+    author: joi.string().required().messages({
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
     like: joi.number().messages({
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
     view: joi.number().messages({
-      "string.empty": `باید رشته ای از حروف باشد`,
+      "string.empty": `تعداد بازدید باید رشته ای از حروف باشد `,
     }),
   });
   const { error } = schema.validate(data, { abortEarly: false });

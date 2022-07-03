@@ -11,7 +11,10 @@ const blog = mongoose.Schema({
   tags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tag" }],
   category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "comment" }],
-  author: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  author: {
+    _id: { type: mongoose.Schema.Types.ObjectId, require: true },
+    fullname: { type: String, require: true },
+  },
   user_like: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   published_at: { type: Date, default: null },
   created_at: { type: Date, default: Date.now() },

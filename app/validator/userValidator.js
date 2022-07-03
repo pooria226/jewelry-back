@@ -19,6 +19,14 @@ const storeValidator = (data) => {
     avatar: joi.string().messages({
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
+    code_meli: joi.string().messages({
+      "string.empty": `باید رشته ای از حروف باشد`,
+    }),
+    date_of_birth: joi.string().messages({
+      "string.empty": `باید رشته ای از حروف باشد`,
+    }),
+    isActive: joi.boolean(),
+    isVerifyd: joi.boolean(),
   });
   const { error } = schema.validate(data, { abortEarly: false });
   const array = [];
