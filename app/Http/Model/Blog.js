@@ -9,6 +9,7 @@ const blog = mongoose.Schema({
   view: { type: Number, default: 0 },
   image_origin: { type: String, require: true },
   tags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tag" }],
+  description: { type: String, require: true },
   category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "comment" }],
   author: {

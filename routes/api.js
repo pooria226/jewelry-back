@@ -13,6 +13,7 @@ const ProductController = require("../app/Http/Controller/ProductController");
 const PaymentController = require("../app/Http/Controller/PaymentController");
 const SliderController = require("../app/Http/Controller/SliderController");
 const HomeController = require("../app/Http/Controller/website/HomeController");
+const WebBlogController = require("../app/Http/Controller/website/BlogController");
 const { authentication } = require("../app/middleware/authentication");
 
 // Start Auth
@@ -142,12 +143,19 @@ router.delete("/about/team/:id", authentication, AboutController.delete);
 
 //**********************************************************  Start website
 // Start home
-router.get("/home/slider", HomeController.all);
+router.get("/public/home/slider", HomeController.all);
 // end home
 
 // Start about
-router.get("/about-us/team", AboutController.team);
+router.get("/public/about-us/team", AboutController.team);
 // end about
+
+// Start Blog
+router.get("/public/blogs/:page", WebBlogController.all);
+router.post("/public/blog/search/:page", WebBlogController.search);
+router.get("/public/category", WebBlogController.category);
+router.get("/public/tag", WebBlogController.tag);
+// end Blog
 //********************************************************* End website
 
 module.exports = router;
