@@ -22,10 +22,15 @@ const storeValidator = (data) => {
       "array.empty": `باید ارائه ای از برچسب ها باشد`,
     }),
     category: joi.string().messages({
-      "string.empty": `باید رشته ای از حروف باشد`,
+      "string.empty": ` دسته بندی باید رشته ای از حروف باشد`,
     }),
     author: joi.string().required().messages({
-      "string.empty": `باید رشته ای از حروف باشد`,
+      "any.required": `نویسنده اجباری است`,
+      "string.empty": `نویسنده باید رشته ای از حروف باشد `,
+    }),
+    description: joi.string().required().messages({
+      "any.required": `توضیحات  اجباری است`,
+      "string.empty": `توضیحات باید رشته ای از حروف باشد`,
     }),
     like: joi.number().messages({
       "string.empty": `باید رشته ای از حروف باشد`,
@@ -35,7 +40,6 @@ const storeValidator = (data) => {
     }),
   });
   const { error } = schema.validate(data, { abortEarly: false });
-  console.log("error", error);
   const array = [];
   if (error) {
     error.details.map((item, index) => {
@@ -94,6 +98,10 @@ const updateValidator = (data) => {
     }),
     author: joi.string().messages({
       "string.empty": `باید رشته ای از حروف باشد`,
+    }),
+    description: joi.string().messages({
+      "any.required": `توضیحات  اجباری است`,
+      "string.empty": `توضیحات باید رشته ای از حروف باشد`,
     }),
     like: joi.number().messages({
       "string.empty": `باید رشته ای از حروف باشد`,

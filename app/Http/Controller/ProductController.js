@@ -10,7 +10,7 @@ const { goldPrice } = require("../../../utils/goldPrice");
 
 module.exports.all = async (req, res) => {
   const { page } = req.params;
-  const perPage = 10;
+  const perPage = 12;
   try {
     const products = await Product.find()
       .skip((page - 1) * perPage)
@@ -78,11 +78,21 @@ module.exports.store = async (req, res) => {
 module.exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, slug, price, weight, category, image_origin, images } =
-      req.body;
+    const {
+      title,
+      slug,
+      price,
+      weight,
+      category,
+      image_origin,
+      images,
+      description,
+      percentage,
+    } = req.body;
     const errors = updateValidator({ ...req.body, id: id });
     if (errors.length > 0)
       return res.status(401).json({ success: false, errors: errors });
+    const image = await File.findById(image_origin);
     await Product.findByIdAndUpdate(
       id,
       {
@@ -92,7 +102,10 @@ module.exports.update = async (req, res) => {
         weight,
         category,
         image_origin,
-        images,
+        description,
+        images: images,
+        image_origin: image?.name || undefined,
+        percentage,
         updated_at: Date.now(),
       },
       { omitUndefined: true, new: true }
@@ -173,6 +186,29 @@ module.exports.unPublish = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "با موفقیت انجام شد",
+    });
+  } catch (error) {
+    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+  }
+};
+module.exports.search = async (req, res) => {
+  try {
+    const { page } = req.params;
+    const { query } = req.body;
+    const perPage = 12;
+    const regex = new RegExp(query, "i");
+    const products = await Product.find({ title: { $regex: regex } })
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .sort({ create_at: 1 })
+      .select("-code -created_code");
+    const products_count = await (
+      await Product.find({ title: { $regex: regex } })
+    ).length;
+    const pages = Math.ceil(products_count / perPage);
+    res.status(200).json({
+      success: true,
+      data: { products, pages, count: products_count },
     });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });

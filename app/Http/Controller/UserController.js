@@ -399,7 +399,7 @@ module.exports.update = async (req, res) => {
     );
     res
       .status(200)
-      .json({ message: "کاربر با موفقیت اضافه شد", success: true });
+      .json({ message: "کاربر با موفقیت ویرایش شد", success: true });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }

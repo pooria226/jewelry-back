@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
 
 const category = mongoose.Schema({
-  title: { type: String, required: true },
+  title: { type: String, required: true, unique: false },
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  position: { type: String, enum: ["blog", "product"], require: true },
   parent_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",

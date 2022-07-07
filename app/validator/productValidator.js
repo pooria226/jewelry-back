@@ -10,6 +10,7 @@ const storeValidator = (data) => {
       "any.required": `اسلاگ اجباری است`,
       "string.empty": `اسلاگ باید رشته ای از حروف باشد`,
     }),
+
     price: joi.number().required().messages({
       "any.required": `قیمت اجباری است`,
       "number.empty": `قیمت باید عدد باشد`,
@@ -27,6 +28,10 @@ const storeValidator = (data) => {
     }),
     category: joi.string().messages({
       "string.empty": `دسته بندی باید رشته ای از حروف باشد `,
+    }),
+    description: joi.string().messages({
+      "any.required": `توضیحات اجباری است`,
+      "string.empty": `توضیحات باید رشته ای از حروف باشد`,
     }),
     percentage: joi.number().required().messages({
       "any.required": `درصد طلا  فروش اجباری است`,
@@ -101,6 +106,17 @@ const updateValidator = (data) => {
     carat: joi.number().messages({
       "any.required": `عیار طلا اجباری است`,
       "number.empty": `باید عدد باشد`,
+    }),
+    description: joi.string().messages({
+      "any.required": `توضیحات اجباری است`,
+      "string.empty": `توضیحات باید رشته ای از حروف باشد`,
+    }),
+    percentage: joi.number().messages({
+      "any.required": `درصد طلا  فروش اجباری است`,
+      "number.empty": `درصد طلا  فروش باید عدد باشد`,
+    }),
+    view: joi.number().messages({
+      "string.empty": `تعداد بازدید باید رشته ای از حروف باشد `,
     }),
   });
   const { error } = schema.validate(data, { abortEarly: false });

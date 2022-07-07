@@ -12,6 +12,7 @@ const user = new mongoose.Schema({
   phone: { type: String, required: true, unique: true, min: 11, max: 11 },
   avatar: { type: String, default: null },
   favorite_product: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+  favorite_blog: [{ type: mongoose.Schema.Types.ObjectId, ref: "Blog" }],
   role: {
     type: String,
     required: true,

@@ -44,6 +44,7 @@ module.exports.store = async (req, res) => {
       like,
       view,
       author,
+      description,
     } = req.body;
     const errors = storeValidator(req.body);
     if (errors.length > 0)
@@ -54,6 +55,7 @@ module.exports.store = async (req, res) => {
         errors: [{ key: "title", message: "مقاله ای با این نام ثبت شده است" }],
         success: false,
       });
+    /// handle slug condition
     const image = await File.findById(image_origin);
     const authorUser = await User.findById(author);
     await Blog.create({
@@ -69,6 +71,7 @@ module.exports.store = async (req, res) => {
       like,
       view,
       image_origin: image?.name || undefined,
+      description,
     });
     res.status(200).json({ message: "با  موفقیت انجام شد", success: true });
   } catch (error) {
@@ -103,6 +106,7 @@ module.exports.update = async (req, res) => {
       image_origin,
       like,
       view,
+      description,
     } = req.body;
     const errors = updateValidator({ ...req.body, id: id });
     if (errors.length > 0)
@@ -125,6 +129,7 @@ module.exports.update = async (req, res) => {
         view,
         image_origin: image?.name || undefined,
         updated_at: Date.now(),
+        description,
       },
       { omitUndefined: true, new: true }
     );

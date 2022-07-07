@@ -44,12 +44,13 @@ module.exports.all = async (req, res) => {
 };
 module.exports.store = async (req, res) => {
   try {
-    const { title, parent_id } = req.body;
+    const { title, parent_id, position } = req.body;
     const errors = storeValidator(req.body);
     if (errors.length > 0)
       return res.status(400).json({ success: false, errors: errors });
     const dupCategory = await Category.findOne({ title });
-    if (dupCategory)
+    console.log("dupCategory", dupCategory);
+    if (dupCategory?.parent_id != null && dupCategory?.parent_id == parent_id)
       return res.status(400).json({
         success: false,
         errors: [
@@ -59,9 +60,10 @@ module.exports.store = async (req, res) => {
           },
         ],
       });
-    await Category.create({ title, user: req.user._id, parent_id });
+    await Category.create({ title, user: req.user._id, parent_id, position });
     res.status(200).json({ success: true, message: "با موفقیت انجام شد" });
   } catch (error) {
+    console.log("error", error);
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }
 };
@@ -81,7 +83,7 @@ module.exports.show = async (req, res) => {
 module.exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title } = req.body;
+    const { title, position } = req.body;
     const errors = updateValidator({ ...req.body, id: id });
     if (errors.length > 0)
       return res.status(400).json({ success: false, errors: errors });
@@ -89,6 +91,7 @@ module.exports.update = async (req, res) => {
       id,
       {
         title,
+        position,
         updated_at: Date.now(),
       },
       { omitUndefined: true, new: true }

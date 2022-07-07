@@ -14,7 +14,9 @@ const PaymentController = require("../app/Http/Controller/PaymentController");
 const SliderController = require("../app/Http/Controller/SliderController");
 const HomeController = require("../app/Http/Controller/website/HomeController");
 const WebBlogController = require("../app/Http/Controller/website/BlogController");
+const WebProductController = require("../app/Http/Controller/website/ProductController");
 const { authentication } = require("../app/middleware/authentication");
+const { public } = require("../app/middleware/public");
 
 // Start Auth
 router.post("/auth/receive", AuthController.receive);
@@ -107,6 +109,7 @@ router.post("/product", authentication, ProductController.store);
 router.put("/product/:id", authentication, ProductController.update);
 router.delete("/product/:id", authentication, ProductController.delete);
 router.get("/product/publish/:id", authentication, ProductController.publish);
+router.post("/product/search/:page", authentication, ProductController.search);
 router.get(
   "/product/unpublish/:id",
   authentication,
@@ -152,9 +155,16 @@ router.get("/public/about-us/team", AboutController.team);
 
 // Start Blog
 router.get("/public/blogs/:page", WebBlogController.all);
+router.get("/public/blog/new", WebBlogController.news);
+router.get("/public/blog/:slug", public, WebBlogController.show);
 router.post("/public/blog/search/:page", WebBlogController.search);
 router.get("/public/category", WebBlogController.category);
 router.get("/public/tag", WebBlogController.tag);
+router.get("/public/blog/like/:id", authentication, WebBlogController.like);
+// end Blog
+
+// Start Blog
+router.get("/public/product/:page", WebProductController.all);
 // end Blog
 //********************************************************* End website
 

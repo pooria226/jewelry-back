@@ -39,10 +39,10 @@ module.exports.receive = async (req, res) => {
       const code = codeGenerator();
       user.code = code;
       user.created_code = new Date();
-      const { status } = await handleSendSms(
-        `کد تایید شما ${code}`,
-        user.phone
-      );
+      // const { status } = await handleSendSms(
+      //   `کد تایید شما ${code}`,
+      //   user.phone
+      // );
       user.save();
       return res.status(200).json({
         message: "لطفا کد تایید را وارد کنید",

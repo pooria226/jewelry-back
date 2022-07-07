@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
 const blog = mongoose.Schema({
-  title: { type: String, required: true },
-  slug: { type: String, required: true },
+  title: { type: String, required: true, unique: true },
+  slug: { type: String, required: true, unique: true },
   content: { type: String, required: true },
   isPublished: { type: Boolean, default: false },
   like: { type: Number, default: 0 },
@@ -16,7 +16,6 @@ const blog = mongoose.Schema({
     _id: { type: mongoose.Schema.Types.ObjectId, require: true },
     fullname: { type: String, require: true },
   },
-  user_like: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   published_at: { type: Date, default: null },
   created_at: { type: Date, default: Date.now() },
   updated_at: { type: Date, default: null },

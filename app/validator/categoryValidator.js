@@ -8,6 +8,10 @@ const storeValidator = (data) => {
       "string.empty": `عنوان اجباری است`,
     }),
     parent_id: joi.string(),
+    position: joi.string().required().messages({
+      "any.required": `جایگاه اجباری است`,
+      "string.empty": `جایگاه اجباری است`,
+    }),
   });
   const { error } = schema.validate(data, { abortEarly: false });
   const array = [];
@@ -50,6 +54,10 @@ const updateValidator = (data) => {
       "string.empty": `عنوان باید رشته ای از حروف باشد`,
     }),
     parent_id: joi.string(),
+    position: joi.string().messages({
+      "any.required": `جایگاه اجباری است`,
+      "string.empty": `جایگاه اجباری است`,
+    }),
   });
   const { error } = schema.validate(data, { abortEarly: false });
   const array = [];
