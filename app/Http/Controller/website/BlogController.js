@@ -48,33 +48,21 @@ module.exports.show = async (req, res) => {
 };
 module.exports.search = async (req, res) => {
   try {
-    let finder;
+    let finder = {};
     const { page } = req.params;
     const { query, category, tags } = req.body;
     const perPage = 9;
     const regex = new RegExp(query, "i");
-    if (query && !category && !tags) {
-      finder = { title: regex };
+
+    if (query) {
+      finder.title = regex;
     }
-    if (!query && category && !tags) {
-      finder = { category: category };
+    if (category) {
+      finder.category = category;
     }
-    if (!query && !category && tags) {
-      finder = { tags: tags };
+    if (tags) {
+      finder.tags = tags;
     }
-    if (query && category && !tags) {
-      finder = { title: regex, category: category };
-    }
-    if (!query && category && tags) {
-      finder = { tags: tags, category: category };
-    }
-    if (query && !category && tags) {
-      finder = { title: regex, category: category };
-    }
-    if (query && category && tags) {
-      finder = { title: regex, category: category, tags: tags };
-    }
-    console.log("finder", finder);
     const blogs = await Blog.find(finder)
       .skip((page - 1) * perPage)
       .limit(perPage)

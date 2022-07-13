@@ -26,8 +26,6 @@ router.post("/auth/login", AuthController.login);
 // Start User
 router.post("/user/current", authentication, UserController.currentUser);
 router.get("/user/profile", authentication, UserController.profile);
-router.post("/user/walet", authentication, UserController.walet);
-router.get("/user/walet/verify", UserController.verifyWalet);
 router.get("/user/orders/all", authentication, UserController.ordersAll);
 router.post("/user/orders/pay", authentication, UserController.ordersPay);
 router.get("/user/orders/verify", UserController.verifyOrder);
@@ -154,18 +152,21 @@ router.get("/public/about-us/team", AboutController.team);
 // end about
 
 // Start Blog
+router.get("/public/blog/category", WebBlogController.category);
 router.get("/public/blogs/:page", WebBlogController.all);
 router.get("/public/blog/new", WebBlogController.news);
 router.get("/public/blog/:slug", public, WebBlogController.show);
 router.post("/public/blog/search/:page", WebBlogController.search);
-router.get("/public/category", WebBlogController.category);
 router.get("/public/tag", WebBlogController.tag);
 router.get("/public/blog/like/:id", authentication, WebBlogController.like);
 // end Blog
 
-// Start Blog
+// Start Product
+router.get("/public/product/category", WebProductController.category);
+router.get("/public/product/new", WebProductController.news);
+router.post("/public/product/search/:page", WebProductController.search);
 router.get("/public/product/:page", WebProductController.all);
-// end Blog
+// end Product
 //********************************************************* End website
 
 module.exports = router;

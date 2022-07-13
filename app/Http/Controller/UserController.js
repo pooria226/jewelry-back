@@ -89,57 +89,6 @@ module.exports.avatarUpdate = async (req, res) => {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }
 };
-module.exports.walet = async (req, res) => {
-  try {
-    const { amount } = req.body;
-    const result = await zarinpal.PaymentRequest({
-      Amount: amount,
-      CallbackURL: "https://jewelry-back.iran.liara.run/api/user/walet/verify",
-      Description: "A Payment from jewelry",
-      Mobile: req.user.phone,
-    });
-    if (result.status == 100) {
-      await Payment.create({
-        user: req.user.id,
-        amount: amount,
-        authority: result.authority,
-      });
-      res.status(200).json({ success: true, data: result.url });
-    } else {
-      res.status(400).json({ message: "مشکلی پیش امده", success: false });
-    }
-  } catch (error) {
-    res.status(400).json({ message: "مشکلی پیش امده", success: false });
-  }
-};
-module.exports.verifyWalet = async (req, res) => {
-  try {
-    const authority = req.query.Authority;
-    const status = req.query.Status;
-    const payment = await Payment.findOne({ authority });
-    if (status == "OK") {
-      const result = await zarinpal.PaymentVerification({
-        Amount: payment.amount,
-        Authority: authority,
-      });
-      if (result.status == -21) {
-        res.redirect("https://jewelry.iran.liara.run/dashboard");
-      } else {
-        payment.ref_id = result.RefID;
-        payment.success = true;
-        await payment.save();
-        const user = await User.findById(payment.user);
-        user.walet += parseInt(payment.amount || 0);
-        await user.save();
-        res.redirect("https://jewelry.iran.liara.run/dashboard");
-      }
-    } else {
-      res.redirect("https://jewelry.iran.liara.run/dashboard");
-    }
-  } catch (error) {
-    res.status(400).json({ message: "مشکلی پیش امده", success: false });
-  }
-};
 module.exports.ordersAll = async (req, res) => {
   try {
     const orders = await Order.find({ user: req.user.id, pay: false }).populate(
@@ -172,7 +121,7 @@ module.exports.ordersStore = async (req, res) => {
 };
 module.exports.ordersPay = async (req, res) => {
   try {
-    const { order_id, useWalet } = req.body;
+    const { order_id } = req.body;
     let amount = 0;
     const orders = await Order.findById(order_id).populate({
       path: "products",
@@ -181,63 +130,24 @@ module.exports.ordersPay = async (req, res) => {
     const product_price = orders.products.reduce((acc, item) => {
       return (acc += item.price);
     }, 0);
-    if (useWalet == 1) {
-      const user = await User.findById(req.user.id);
-      const walet = user.walet;
-      if (product_price > walet) {
-        amount = product_price - walet;
-        const result = await zarinpal.PaymentRequest({
-          Amount: amount,
-          CallbackURL:
-            "https://jewelry-back.iran.liara.run/api/user/orders/verify",
-          Description: "A Payment from jewelry",
-          Mobile: req.user.phone,
-        });
-        if (result.status == 100) {
-          await Payment.create({
-            user: req.user.id,
-            amount: amount,
-            authority: result.authority,
-            orders: orders.id,
-          });
-          res.status(200).json({ success: true, data: result.url });
-        } else {
-          res.status(400).json({ message: "مشکلی پیش امده", success: false });
-        }
-      } else {
-        const remaining = walet - product_price;
-        user.walet = remaining;
-        await user.save();
-        const order = await Order.findById(order_id);
-        console.log("order", order);
-        order.pay = true;
-        order.status = 1;
-        await order.save();
-        res
-          .status(200)
-          .json({ success: true, message: "پرداخت با موفقیت انجام شد" });
-      }
-    } else {
-      amount = product_price;
-      const result = await zarinpal.PaymentRequest({
-        Amount: amount,
-        CallbackURL: "https://jewelry.iran.liara.run/api/user/orders/verify",
-        Description: "A Payment from jewelry",
-        Mobile: req.user.phone,
+    amount = product_price;
+    const result = await zarinpal.PaymentRequest({
+      Amount: amount,
+      CallbackURL: "https://jewelry.iran.liara.run/api/user/orders/verify",
+      Description: "A Payment from jewelry",
+      Mobile: req.user.phone,
+    });
+    if (result.status == 100) {
+      await Payment.create({
+        user: req.user.id,
+        amount: amount,
+        authority: result.authority,
+        orders: orders.id,
       });
-      if (result.status == 100) {
-        await Payment.create({
-          user: req.user.id,
-          amount: amount,
-          authority: result.authority,
-          orders: orders.id,
-        });
-        res.status(200).json({ success: true, data: result.url });
-      } else {
-        res.status(400).json({ message: "مشکلی پیش امده", success: false });
-      }
+      res.status(200).json({ success: true, data: result.url });
+    } else {
+      res.status(400).json({ message: "مشکلی پیش امده", success: false });
     }
-
     // const amount=orders
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
