@@ -53,6 +53,7 @@ module.exports.store = async (req, res) => {
       images,
       description,
       percentage,
+      like,
     } = req.body;
     const errors = storeValidator(req.body);
     if (errors.length > 0)
@@ -69,6 +70,7 @@ module.exports.store = async (req, res) => {
       images: images,
       image_origin: image?.name || undefined,
       percentage,
+      like,
     });
     res.status(200).json({ success: true, message: "با موفقیت ثبت شد" });
   } catch (error) {
@@ -88,11 +90,13 @@ module.exports.update = async (req, res) => {
       images,
       description,
       percentage,
+      like,
     } = req.body;
     const errors = updateValidator({ ...req.body, id: id });
     if (errors.length > 0)
       return res.status(401).json({ success: false, errors: errors });
     const image = await File.findById(image_origin);
+
     await Product.findByIdAndUpdate(
       id,
       {
@@ -106,12 +110,14 @@ module.exports.update = async (req, res) => {
         images: images,
         image_origin: image?.name || undefined,
         percentage,
+        like,
         updated_at: Date.now(),
       },
       { omitUndefined: true, new: true }
     );
     res.status(200).json({ message: "با  موفقیت انجام شد", success: true });
   } catch (error) {
+    console.log("error", error);
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }
 };

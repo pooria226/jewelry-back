@@ -1,3 +1,5 @@
+const Favorite = require("../../Model/Favorite");
+const Order = require("../../Model/Order");
 const Slider = require("../../Model/Slider");
 module.exports.all = async (req, res) => {
   try {
@@ -13,6 +15,32 @@ module.exports.all = async (req, res) => {
       },
     });
   } catch (error) {
+    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+  }
+};
+module.exports.favoriteLength = async (req, res) => {
+  try {
+    const favorites = await (
+      await Favorite.find({ user: req?.user?._id })
+    ).length;
+    res.status(200).json({
+      success: true,
+      data: favorites,
+    });
+  } catch (error) {
+    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+  }
+};
+module.exports.orderLength = async (req, res) => {
+  try {
+    const order = await Order.findOne({ user: req?.user?._id });
+    console.log("orderrrr", order.pro);
+    res.status(200).json({
+      success: true,
+      data: order.products.length || 0,
+    });
+  } catch (error) {
+    console.log("error", error);
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }
 };

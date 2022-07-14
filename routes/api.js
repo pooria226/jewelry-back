@@ -12,6 +12,7 @@ const BlogController = require("../app/Http/Controller/BlogController");
 const ProductController = require("../app/Http/Controller/ProductController");
 const PaymentController = require("../app/Http/Controller/PaymentController");
 const SliderController = require("../app/Http/Controller/SliderController");
+const FavoriteController = require("../app/Http/Controller/FavoriteController");
 const HomeController = require("../app/Http/Controller/website/HomeController");
 const WebBlogController = require("../app/Http/Controller/website/BlogController");
 const WebProductController = require("../app/Http/Controller/website/ProductController");
@@ -142,9 +143,16 @@ router.put("/about/team/:id", authentication, AboutController.update);
 router.delete("/about/team/:id", authentication, AboutController.delete);
 // End about
 
+// Start favorite
+router.get("/favorite/all/:page", authentication, FavoriteController.all);
+router.get("/favorite/delete/:id", authentication, FavoriteController.delete);
+// End favorite
+
 //**********************************************************  Start website
 // Start home
 router.get("/public/home/slider", HomeController.all);
+router.get("/public/home/favorite", public, HomeController.favoriteLength);
+router.get("/public/home/order", public, HomeController.orderLength);
 // end home
 
 // Start about
@@ -162,10 +170,23 @@ router.get("/public/blog/like/:id", authentication, WebBlogController.like);
 // end Blog
 
 // Start Product
-router.get("/public/product/category", WebProductController.category);
+
 router.get("/public/product/new", WebProductController.news);
+router.get("/public/product/:slug", public, WebProductController.show);
+router.get("/public/product/category", WebProductController.category);
+router.get(
+  "/public/product/like/:id",
+  authentication,
+  WebProductController.like
+);
+router.get(
+  "/public/product/favorite/:id",
+  authentication,
+  WebProductController.favorite
+);
 router.post("/public/product/search/:page", WebProductController.search);
 router.get("/public/product/:page", WebProductController.all);
+router.get("/public/product/order/:id", public, WebProductController.order);
 // end Product
 //********************************************************* End website
 

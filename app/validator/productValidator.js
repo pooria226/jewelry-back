@@ -40,6 +40,9 @@ const storeValidator = (data) => {
     view: joi.number().messages({
       "string.empty": `تعداد بازدید باید رشته ای از حروف باشد `,
     }),
+    like: joi.number().messages({
+      "string.empty": `باید رشته ای از حروف باشد`,
+    }),
   });
   const { error } = schema.validate(data, { abortEarly: false });
   const array = [];
@@ -117,6 +120,9 @@ const updateValidator = (data) => {
     }),
     view: joi.number().messages({
       "string.empty": `تعداد بازدید باید رشته ای از حروف باشد `,
+    }),
+    like: joi.number().messages({
+      "string.empty": `باید رشته ای از حروف باشد`,
     }),
   });
   const { error } = schema.validate(data, { abortEarly: false });

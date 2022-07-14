@@ -1,6 +1,7 @@
 const { isEmpty } = require("lodash");
 const Blog = require("../../Model/Blog");
 const Category = require("../../Model/Category");
+const Like = require("../../Model/Like");
 const Tag = require("../../Model/Tag");
 const User = require("../../Model/User");
 var ObjectId = require("mongoose").Types.ObjectId;
@@ -28,19 +29,23 @@ module.exports.all = async (req, res) => {
 module.exports.show = async (req, res) => {
   try {
     const { slug } = req.params;
-    const user = req.user;
+    let liked = false;
     const blog = await Blog.findOne({ slug: slug })
       .populate({ path: "tags", select: "id title" })
       .populate({ path: "author", select: "id first_name last_name" })
       .populate({ path: "category" });
-    const likedItem = user?.favorite_blog.filter(
-      (item) => item.title == blog.title
-    )[0];
     blog.view += 1;
     await blog.save();
+    const target = await Like.findOne({
+      user: req?.user?._id,
+      target_id: blog?._id,
+    });
+    if (target) {
+      liked = true;
+    }
     res.status(200).json({
       success: true,
-      data: { blog, liked: !isEmpty(likedItem) ? true : false },
+      data: { blog, liked: liked },
     });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
@@ -100,29 +105,33 @@ module.exports.like = async (req, res) => {
   try {
     const { id } = req.params;
     const blog = await Blog.findById(id);
-    const user = await User.findById(req.user.id).populate({
-      path: "favorite_blog",
-      select: "id title",
+    const dup_like = await Like.findOne({
+      user: req.user?._id,
+      target_id: blog?._id,
     });
-    const likedItem = user?.favorite_blog.filter(
-      (item) => item.title == blog.title
-    )[0];
-    if (likedItem) {
-      user.favorite_blog = user?.favorite_blog.filter(
-        (item) => item.title != blog.title
-      )[0];
+    if (dup_like) {
+      await dup_like.remove();
       blog.like -= 1;
+      await blog.save();
+      return res.status(200).json({
+        data: { blog, liked: false },
+        message: "با موفقیت انجام شد",
+        success: true,
+      });
     } else {
-      user.favorite_blog = [...user.favorite_blog, blog._id];
+      await Like.create({
+        target_id: blog?._id,
+        position: "blog",
+        user: req?.user?._id,
+      });
       blog.like += 1;
+      await blog.save();
+      return res.status(200).json({
+        data: { blog, liked: true },
+        message: "با موفقیت انجام شد",
+        success: true,
+      });
     }
-    await user.save();
-    await blog.save();
-    return res.status(200).json({
-      data: { blog, liked: !isEmpty(likedItem) ? true : false },
-      message: "با موفقیت انجام شد",
-      success: true,
-    });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }
