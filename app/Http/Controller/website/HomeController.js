@@ -33,12 +33,15 @@ module.exports.favoriteLength = async (req, res) => {
 };
 module.exports.orderLength = async (req, res) => {
   try {
-    const order = await Order.findOne({ user: req?.user?._id });
-    console.log("orderrrr", order.pro);
-    res.status(200).json({
-      success: true,
-      data: order.products.length || 0,
-    });
+    if (req?.user) {
+      const order = await Order.findOne({ user: req?.user?._id });
+      res.status(200).json({
+        success: true,
+        data: order?.products?.length || 0,
+      });
+    } else {
+      res.status(400).json({ message: "مشکلی پیش امده", success: false });
+    }
   } catch (error) {
     console.log("error", error);
     res.status(400).json({ message: "مشکلی پیش امده", success: false });

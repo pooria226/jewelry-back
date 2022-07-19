@@ -4,6 +4,7 @@ const Category = require("../../Model/Category");
 const Like = require("../../Model/Like");
 const Tag = require("../../Model/Tag");
 const User = require("../../Model/User");
+const Comment = require("../../Model/Comment");
 var ObjectId = require("mongoose").Types.ObjectId;
 module.exports.all = async (req, res) => {
   const { page } = req.params;
@@ -143,6 +144,36 @@ module.exports.news = async (req, res) => {
       .limit(5);
     return res.status(200).json({
       data: blogs,
+      success: true,
+    });
+  } catch (error) {
+    console.log("error", error);
+    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+  }
+};
+
+module.exports.addComment = async (req, res) => {
+  try {
+    const { content, slug } = req.body;
+    const blog = await Blog.findOne({ slug }).populate({
+      path: "category",
+      select: "title",
+    });
+    const comment = await Comment.create({
+      content: content,
+      user: req?.user?._id,
+      model: "blog",
+      target: {
+        _id: blog?._id,
+        title: blog?.title,
+        category: blog?.category?.title,
+        image_origin: blog?.image_origin,
+      },
+    });
+    blog.comments = [...blog?.comments, comment._id];
+    await blog.save();
+    return res.status(200).json({
+      message: "دیدگاه شما با موفقیت ثبت شد و پس از بررسی منتشر می شود",
       success: true,
     });
   } catch (error) {

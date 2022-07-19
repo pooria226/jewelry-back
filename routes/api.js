@@ -13,6 +13,8 @@ const ProductController = require("../app/Http/Controller/ProductController");
 const PaymentController = require("../app/Http/Controller/PaymentController");
 const SliderController = require("../app/Http/Controller/SliderController");
 const FavoriteController = require("../app/Http/Controller/FavoriteController");
+const CommentController = require("../app/Http/Controller/CommentController");
+const OrderController = require("../app/Http/Controller/OrderController");
 const HomeController = require("../app/Http/Controller/website/HomeController");
 const WebBlogController = require("../app/Http/Controller/website/BlogController");
 const WebProductController = require("../app/Http/Controller/website/ProductController");
@@ -27,10 +29,7 @@ router.post("/auth/login", AuthController.login);
 // Start User
 router.post("/user/current", authentication, UserController.currentUser);
 router.get("/user/profile", authentication, UserController.profile);
-router.get("/user/orders/all", authentication, UserController.ordersAll);
-router.post("/user/orders/pay", authentication, UserController.ordersPay);
-router.get("/user/orders/verify", UserController.verifyOrder);
-router.post("/user/orders", authentication, UserController.ordersStore);
+
 router.post("/user/profile", authentication, UserController.profileUpdate);
 router.post("/user/avatar", authentication, UserController.avatarUpdate);
 router.post("/user/all/:page", authentication, UserController.all);
@@ -40,6 +39,12 @@ router.put("/user/:id", authentication, UserController.update);
 router.delete("/user/:id", authentication, UserController.delete);
 router.post("/user/search/:page", authentication, UserController.search);
 // End User
+
+// Start Order
+router.get("/orders/verify", OrderController.verifyOrder);
+router.get("/orders/all", authentication, OrderController.ordersAll);
+router.get("/orders/pay/:orderId", authentication, OrderController.ordersPay);
+// End Order
 
 // Start Tag
 router.get("/tag/all/:page", authentication, TagController.all);
@@ -80,6 +85,11 @@ router.post("/address", authentication, AddressController.store);
 router.get("/address/:id", authentication, AddressController.show);
 router.put("/address/:id", authentication, AddressController.update);
 router.delete("/address/:id", authentication, AddressController.delete);
+router.get(
+  "/address/select/:id",
+  authentication,
+  AddressController.selectAddress
+);
 // End Address
 
 // Start Blog
@@ -148,6 +158,13 @@ router.get("/favorite/all/:page", authentication, FavoriteController.all);
 router.get("/favorite/delete/:id", authentication, FavoriteController.delete);
 // End favorite
 
+// Start comment
+router.get("/comment/all/:page", authentication, CommentController.all);
+router.get("/comment/answer/:id", authentication, CommentController.show);
+router.post("/comment/answer/:id", authentication, CommentController.answer);
+router.get("/comment/:id", authentication, CommentController.publish);
+// End comment
+
 //**********************************************************  Start website
 // Start home
 router.get("/public/home/slider", HomeController.all);
@@ -167,10 +184,15 @@ router.get("/public/blog/:slug", public, WebBlogController.show);
 router.post("/public/blog/search/:page", WebBlogController.search);
 router.get("/public/tag", WebBlogController.tag);
 router.get("/public/blog/like/:id", authentication, WebBlogController.like);
+
+router.post(
+  "/public/blog/comment",
+  authentication,
+  WebBlogController.addComment
+);
 // end Blog
 
 // Start Product
-
 router.get("/public/product/new", WebProductController.news);
 router.get("/public/product/:slug", public, WebProductController.show);
 router.get("/public/product/category", WebProductController.category);

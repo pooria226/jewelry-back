@@ -1,20 +1,19 @@
 const User = require("../Model/User.js");
 const File = require("../Model/File.js");
-const Order = require("../Model/Order.js");
-const ZarinpalCheckout = require("zarinpal-checkout");
+
 const {
   storeValidator,
   deleteValidator,
   showValidator,
   updateValidator,
-  orderStoreValidator,
 } = require("../../validator/userValidator");
 const { upload } = require("../../middleware/multer");
-const Payment = require("../Model/Payment.js");
-const zarinpal = ZarinpalCheckout.create(process.env.MERCHANTId, true);
+
 module.exports.currentUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-code -created_code");
+    const user = await User.findById(req?.user?._id).select(
+      "-code -created_code"
+    );
     res.status(200).json({
       success: true,
       data: user,
@@ -89,99 +88,7 @@ module.exports.avatarUpdate = async (req, res) => {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }
 };
-module.exports.ordersAll = async (req, res) => {
-  try {
-    const orders = await Order.find({ user: req.user.id, pay: false }).populate(
-      {
-        path: "products",
-        select: "title price",
-      }
-    );
-    res.status(200).json({ data: orders, success: true });
-  } catch (error) {
-    res.status(400).json({ message: "مشکلی پیش امده", success: false });
-  }
-};
-module.exports.ordersStore = async (req, res) => {
-  try {
-    const { products } = req.body;
-    const errors = orderStoreValidator(req.body);
-    if (errors.length > 0)
-      return res.status(400).json({ success: false, errors: errors });
-    await Order.create({
-      user: req.user.id,
-      products,
-    });
-    res
-      .status(200)
-      .json({ message: "سفارش با موفقیت اضافه شد", success: true });
-  } catch (error) {
-    res.status(400).json({ message: "مشکلی پیش امده", success: false });
-  }
-};
-module.exports.ordersPay = async (req, res) => {
-  try {
-    const { order_id } = req.body;
-    let amount = 0;
-    const orders = await Order.findById(order_id).populate({
-      path: "products",
-      select: "title price",
-    });
-    const product_price = orders.products.reduce((acc, item) => {
-      return (acc += item.price);
-    }, 0);
-    amount = product_price;
-    const result = await zarinpal.PaymentRequest({
-      Amount: amount,
-      CallbackURL: "https://jewelry.iran.liara.run/api/user/orders/verify",
-      Description: "A Payment from jewelry",
-      Mobile: req.user.phone,
-    });
-    if (result.status == 100) {
-      await Payment.create({
-        user: req.user.id,
-        amount: amount,
-        authority: result.authority,
-        orders: orders.id,
-      });
-      res.status(200).json({ success: true, data: result.url });
-    } else {
-      res.status(400).json({ message: "مشکلی پیش امده", success: false });
-    }
-    // const amount=orders
-  } catch (error) {
-    res.status(400).json({ message: "مشکلی پیش امده", success: false });
-  }
-};
-module.exports.verifyOrder = async (req, res) => {
-  try {
-    const authority = req.query.Authority;
-    const status = req.query.Status;
-    const payment = await Payment.findOne({ authority });
-    if (status == "OK") {
-      const result = await zarinpal.PaymentVerification({
-        Amount: payment.amount,
-        Authority: authority,
-      });
-      if (result.status == -21) {
-        res.redirect("https://jewelry.iran.liara.run/dashboard");
-      } else {
-        payment.ref_id = result.RefID;
-        payment.success = true;
-        await payment.save();
-        const order = await Order.findById(payment.orders);
-        order.pay = true;
-        order.status = 1;
-        await order.save();
-        res.redirect("https://jewelry.iran.liara.run/dashboard");
-      }
-    } else {
-      res.redirect("https://jewelry.iran.liara.run/dashboard");
-    }
-  } catch (error) {
-    res.status(400).json({ message: "مشکلی پیش امده", success: false });
-  }
-};
+
 module.exports.all = async (req, res) => {
   try {
     const { page } = req.params;

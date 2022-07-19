@@ -5,7 +5,6 @@ const order = mongoose.Schema({
   products: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      store_at: { type: Date, default: Date.now() },
       ref: "Product",
     },
   ],

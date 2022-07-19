@@ -11,7 +11,7 @@ const blog = mongoose.Schema({
   tags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tag" }],
   description: { type: String, require: true },
   category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
-  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "comment" }],
+  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
   author: {
     _id: { type: mongoose.Schema.Types.ObjectId, require: true },
     fullname: { type: String, require: true },

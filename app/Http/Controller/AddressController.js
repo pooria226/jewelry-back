@@ -9,7 +9,6 @@ const Address = require("../Model/Address");
 module.exports.all = async (req, res) => {
   try {
     const addresses = await Address.find({ user: req.user._id });
-    console.log("addresses", addresses);
     res.status(200).json({ success: true, data: addresses });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
@@ -38,14 +37,17 @@ module.exports.store = async (req, res) => {
     const errors = storeValidator(req.body);
     if (errors.length > 0)
       return res.status(400).json({ success: false, errors: errors });
-    const dup_address = await Address.findOne({ postal_code });
+    const dup_address = await Address.findOne({
+      user: req?.user?._id,
+      postal_code,
+    });
     if (dup_address)
       return res.status(400).json({
         success: false,
         errors: [
           {
             key: "postal_code",
-            message: "ادرسی با این کد پستی دخیر شده است",
+            message: "ادرسی با این کد پستی ذخیره شده است",
           },
         ],
       });
@@ -63,6 +65,7 @@ module.exports.store = async (req, res) => {
     });
     res.status(200).json({ message: "با موفقیت انجام شد", success: true });
   } catch (error) {
+    console.log("error", error);
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }
 };
@@ -137,6 +140,24 @@ module.exports.delete = async (req, res) => {
     if (errors.length > 0)
       return res.status(400).json({ success: false, errors: errors });
     await Address.findByIdAndRemove(id);
+    res.status(200).json({ message: "با موفقیت انجام شد", success: true });
+  } catch (error) {
+    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+  }
+};
+module.exports.selectAddress = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const address = await Address.findById(id);
+    if (address) {
+      const all_address = await Address.find();
+      all_address?.map(async (item, index) => {
+        item.selected = false;
+        await item.save();
+      });
+      address.selected = true;
+      await address.save();
+    }
     res.status(200).json({ message: "با موفقیت انجام شد", success: true });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
