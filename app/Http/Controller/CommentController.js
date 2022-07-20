@@ -1,11 +1,10 @@
 const Comment = require("../Model/Comment");
-
+const { deleteValidator } = require("../../validator/userValidator");
 module.exports.all = async (req, res) => {
   try {
     const { page } = req.params;
     const perPage = 12;
-    const { role } = req.body;
-    const comments = await Comment.find({ role })
+    const comments = await Comment.find()
       .skip((page - 1) * perPage)
       .limit(perPage)
       .populate({
@@ -54,6 +53,21 @@ module.exports.answer = async (req, res) => {
     comment.hasAnswered = true;
     await comment.save();
     res.status(200).json({ success: true, message: "با موفقیت انجام شد" });
+  } catch (error) {
+    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+  }
+};
+module.exports.delete = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const errors = deleteValidator(req.params);
+    if (errors.length > 0)
+      return res.status(400).json({ success: false, errors: errors });
+    await Comment.findByIdAndRemove(id);
+    return res.status(200).json({
+      success: true,
+      message: "دیدگاه با موفقیت حذف شد",
+    });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }

@@ -7,9 +7,6 @@ module.exports.ordersAll = async (req, res) => {
     const orders = await Order.find({
       user: req.user._id,
       pay: false,
-    }).populate({
-      path: "products",
-      select: "title price image_origin weight",
     });
     res.status(200).json({ data: orders, success: true });
   } catch (error) {
@@ -56,7 +53,6 @@ module.exports.verifyOrder = async (req, res) => {
     const authority = req.query.Authority;
     const status = req.query.Status;
     const payment = await Payment.findOne({ authority });
-    console.log("authority", authority);
     if (status == "OK") {
       const result = await zarinpal.PaymentVerification({
         Amount: payment.amount,

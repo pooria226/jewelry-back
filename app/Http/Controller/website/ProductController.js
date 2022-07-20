@@ -3,7 +3,7 @@ const Category = require("../../Model/Category");
 const Like = require("../../Model/Like");
 const Favorite = require("../../Model/Favorite");
 const Order = require("../../Model/Order");
-const { ObjectId } = require("mongodb");
+const Comment = require("../../Model/Comment");
 module.exports.all = async (req, res) => {
   const { page } = req.params;
   const perPage = 12;
@@ -113,6 +113,22 @@ module.exports.show = async (req, res) => {
       .populate({
         path: "images",
         select: "id name",
+      })
+      .populate({
+        path: "comments",
+        match: { isPublished: true },
+        populate: {
+          path: "user",
+          select: "id first_name last_name avatar",
+        },
+      })
+      .populate({
+        path: "comments",
+        match: { isPublished: true },
+        populate: {
+          path: "user_answer",
+          select: "id first_name last_name avatar",
+        },
       });
     if (!product)
       return res
@@ -131,8 +147,8 @@ module.exports.show = async (req, res) => {
     const order_target = await Order.findOne({
       user: req?.user?._id,
       products: product?._id,
+      pay: false,
     });
-    console.log("order_target", order_target);
     if (target) {
       liked = true;
     }
@@ -147,7 +163,6 @@ module.exports.show = async (req, res) => {
       data: { product, liked: liked, favorite: favorite, inOrder: inOrder },
     });
   } catch (error) {
-    console.log("error", error);
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }
 };
@@ -226,25 +241,43 @@ module.exports.order = async (req, res) => {
   try {
     const { id } = req.params;
     const product = await Product.findById(id);
-    const order = await Order.findOne({ user: req?.user?._id });
+    const order = await Order.findOne({ user: req?.user?._id, pay: false });
     if (order) {
       const dupItem = order.products.filter(
-        (item) => item.toString() == product?._id.toString()
+        (item) => item?._id.toString() == product?._id.toString()
       );
       if (dupItem.length > 0) {
         const filterdItem = order.products.filter(
-          (item) => item.toString() != product?._id.toString()
+          (item) => item?._id.toString() != product?._id.toString()
         );
         order.products = filterdItem;
         await order.save();
       } else {
-        order.products.push(product?._id);
+        order.products.push({
+          _id: product?._id,
+          title: product?.title,
+          price: product?.price,
+          image_origin: product?.image_origin,
+          weight: product?.weight,
+          slug: product?.slug,
+          increase_at: Date.now(),
+        });
         await order.save();
       }
     } else {
       await Order.create({
         user: req?.user?._id,
-        products: [product?._id],
+        products: [
+          {
+            _id: product?._id,
+            title: product?.title,
+            price: product?.price,
+            image_origin: product?.image_origin,
+            weight: product?.weight,
+            slug: product?.slug,
+            increase_at: Date.now(),
+          },
+        ],
       });
     }
     return res.status(200).json({
@@ -252,6 +285,33 @@ module.exports.order = async (req, res) => {
       success: true,
     });
   } catch (error) {
+    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+  }
+};
+module.exports.addComment = async (req, res) => {
+  try {
+    const { content, slug } = req.body;
+    const product = await Product.findOne({ slug });
+    console.log("product", product);
+    const comment = await Comment.create({
+      content: content,
+      user: req?.user?._id,
+      model: "product",
+      target: {
+        _id: product?._id,
+        title: product?.title,
+        category: product?.category?.title,
+        image_origin: product?.image_origin,
+      },
+    });
+    product.comments = [...product?.comments, comment._id];
+    await product.save();
+    return res.status(200).json({
+      message: "دیدگاه شما با موفقیت ثبت شد و پس از بررسی منتشر می شود",
+      success: true,
+    });
+  } catch (error) {
+    console.log("error", error);
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }
 };

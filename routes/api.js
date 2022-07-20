@@ -15,6 +15,7 @@ const SliderController = require("../app/Http/Controller/SliderController");
 const FavoriteController = require("../app/Http/Controller/FavoriteController");
 const CommentController = require("../app/Http/Controller/CommentController");
 const OrderController = require("../app/Http/Controller/OrderController");
+const DashboardController = require("../app/Http/Controller/DashboardController");
 const HomeController = require("../app/Http/Controller/website/HomeController");
 const WebBlogController = require("../app/Http/Controller/website/BlogController");
 const WebProductController = require("../app/Http/Controller/website/ProductController");
@@ -26,10 +27,13 @@ router.post("/auth/receive", AuthController.receive);
 router.post("/auth/login", AuthController.login);
 // End Auth
 
+// Start Dashboard
+router.get("/dashboard/order", authentication, DashboardController.orders);
+// End Dashboard
+
 // Start User
 router.post("/user/current", authentication, UserController.currentUser);
 router.get("/user/profile", authentication, UserController.profile);
-
 router.post("/user/profile", authentication, UserController.profileUpdate);
 router.post("/user/avatar", authentication, UserController.avatarUpdate);
 router.post("/user/all/:page", authentication, UserController.all);
@@ -163,6 +167,7 @@ router.get("/comment/all/:page", authentication, CommentController.all);
 router.get("/comment/answer/:id", authentication, CommentController.show);
 router.post("/comment/answer/:id", authentication, CommentController.answer);
 router.get("/comment/:id", authentication, CommentController.publish);
+router.delete("/comment/:id", authentication, CommentController.delete);
 // End comment
 
 //**********************************************************  Start website
@@ -184,7 +189,6 @@ router.get("/public/blog/:slug", public, WebBlogController.show);
 router.post("/public/blog/search/:page", WebBlogController.search);
 router.get("/public/tag", WebBlogController.tag);
 router.get("/public/blog/like/:id", authentication, WebBlogController.like);
-
 router.post(
   "/public/blog/comment",
   authentication,
@@ -208,7 +212,16 @@ router.get(
 );
 router.post("/public/product/search/:page", WebProductController.search);
 router.get("/public/product/:page", WebProductController.all);
-router.get("/public/product/order/:id", public, WebProductController.order);
+router.get(
+  "/public/product/order/:id",
+  authentication,
+  WebProductController.order
+);
+router.post(
+  "/public/product/comment",
+  authentication,
+  WebProductController.addComment
+);
 // end Product
 //********************************************************* End website
 

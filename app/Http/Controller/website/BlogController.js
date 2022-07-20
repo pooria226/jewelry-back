@@ -1,4 +1,3 @@
-const { isEmpty } = require("lodash");
 const Blog = require("../../Model/Blog");
 const Category = require("../../Model/Category");
 const Like = require("../../Model/Like");
@@ -16,6 +15,7 @@ module.exports.all = async (req, res) => {
       .populate({ path: "tags", select: "id title" })
       .populate({ path: "author", select: "id first_name last_name" })
       .populate({ path: "category" })
+
       .sort({ create_at: 1 });
     const blogs_count = await (await Blog.find({ isPublished: true })).length;
     const pages = Math.ceil(blogs_count / perPage);
@@ -34,7 +34,23 @@ module.exports.show = async (req, res) => {
     const blog = await Blog.findOne({ slug: slug })
       .populate({ path: "tags", select: "id title" })
       .populate({ path: "author", select: "id first_name last_name" })
-      .populate({ path: "category" });
+      .populate({ path: "category" })
+      .populate({
+        path: "comments",
+        match: { isPublished: true },
+        populate: {
+          path: "user",
+          select: "id first_name last_name avatar",
+        },
+      })
+      .populate({
+        path: "comments",
+        match: { isPublished: true },
+        populate: {
+          path: "user_answer",
+          select: "id first_name last_name avatar",
+        },
+      });
     blog.view += 1;
     await blog.save();
     const target = await Like.findOne({
@@ -155,10 +171,7 @@ module.exports.news = async (req, res) => {
 module.exports.addComment = async (req, res) => {
   try {
     const { content, slug } = req.body;
-    const blog = await Blog.findOne({ slug }).populate({
-      path: "category",
-      select: "title",
-    });
+    const blog = await Blog.findOne({ slug });
     const comment = await Comment.create({
       content: content,
       user: req?.user?._id,
@@ -177,7 +190,6 @@ module.exports.addComment = async (req, res) => {
       success: true,
     });
   } catch (error) {
-    console.log("error", error);
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }
 };

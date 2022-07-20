@@ -14,7 +14,7 @@ const product = mongoose.Schema({
   category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
   description: { type: String, default: null },
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "comment" }],
+  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
   created_at: { type: Date, default: Date.now() },
   isDeleted: { type: Boolean, default: false },
   published_at: { type: Date, default: null },

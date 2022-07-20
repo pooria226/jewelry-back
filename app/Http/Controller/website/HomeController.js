@@ -34,7 +34,7 @@ module.exports.favoriteLength = async (req, res) => {
 module.exports.orderLength = async (req, res) => {
   try {
     if (req?.user) {
-      const order = await Order.findOne({ user: req?.user?._id });
+      const order = await Order.findOne({ user: req?.user?._id, pay: false });
       res.status(200).json({
         success: true,
         data: order?.products?.length || 0,

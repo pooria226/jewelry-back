@@ -9,8 +9,9 @@ const {
 module.exports.receive = async (req, res) => {
   try {
     const { phone } = req.body;
-    const { error } = verifyValidator(req.body);
-    if (error) return res.status(200).json({ errors: error, success: false });
+    const errors = verifyValidator(req.body);
+    if (errors.length > 0)
+      return res.status(400).json({ errors: errors, success: false });
     const user = await User.findOne({ phone });
     if (!user) {
       await User.create({ phone });
@@ -59,6 +60,7 @@ module.exports.receive = async (req, res) => {
       // }
     }
   } catch (error) {
+    console.log("error", error);
     return res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }
 };
