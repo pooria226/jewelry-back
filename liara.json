@@ -1,8 +1,1 @@
-{
-  "disks": [
-    {
-      "name": "data",
-      "mountTo": "./public/uploads"
-    }
-  ]
-}
+
