@@ -139,7 +139,7 @@ module.exports.delete = async (req, res) => {
 module.exports.priceCorrecdddtion = async (req, res) => {
   try {
     const products = await Product.find();
-    const price = currentPrice();
+    const price = await currentPrice();
     console.log("price", price);
     products.map(async (item) => {
       item.price = Math.round(
