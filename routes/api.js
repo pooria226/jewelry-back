@@ -14,6 +14,7 @@ const PaymentController = require("../app/Http/Controller/PaymentController");
 const SliderController = require("../app/Http/Controller/SliderController");
 const FavoriteController = require("../app/Http/Controller/FavoriteController");
 const CommentController = require("../app/Http/Controller/CommentController");
+const InstructionController = require("../app/Http/Controller/InstructionController");
 const OrderController = require("../app/Http/Controller/OrderController");
 const DashboardController = require("../app/Http/Controller/DashboardController");
 const HomeController = require("../app/Http/Controller/website/HomeController");
@@ -169,6 +170,20 @@ router.post("/comment/answer/:id", authentication, CommentController.answer);
 router.get("/comment/:id", authentication, CommentController.publish);
 router.delete("/comment/:id", authentication, CommentController.delete);
 // End comment
+
+// Start Instruction
+router.post(
+  "/instruction/all/:page",
+  authentication,
+  InstructionController.ordersAll
+);
+router.get("/instruction/show/:id", authentication, InstructionController.show);
+router.post(
+  "/instruction/show/:id",
+  authentication,
+  InstructionController.delivery
+);
+// End Instruction
 
 //**********************************************************  Start website
 // Start home
