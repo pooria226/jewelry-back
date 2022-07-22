@@ -6,7 +6,7 @@ const {
   updateValidator,
   deleteValidator,
 } = require("../../validator/productValidator");
-const { goldPrice } = require("../../../utils/goldPrice");
+const { currentPrice } = require("../../../utils/currentPrice");
 
 module.exports.all = async (req, res) => {
   const { page } = req.params;
@@ -139,17 +139,14 @@ module.exports.delete = async (req, res) => {
 module.exports.priceCorrecdddtion = async (req, res) => {
   try {
     const products = await Product.find();
-    const result = await goldPrice();
-    if (result?.data?.data.status == 200) {
-      const goldPrice = result?.data?.data?.prices?.geram18.current;
-      let price = goldPrice?.slice(0, goldPrice.length - 1);
-      products.map(async (item) => {
-        item.price = Math.round(
-          item.weight * price + (item.weight * price * item.percentage) / 100
-        );
-        await item.save();
-      });
-    }
+    const price = currentPrice();
+    console.log("price", price);
+    products.map(async (item) => {
+      item.price = Math.round(
+        item.weight * price + (item.weight * price * item.percentage) / 100
+      );
+      await item.save();
+    });
     return res.status(200).json({
       success: true,
       message: "با موفقیت انجام شد",
