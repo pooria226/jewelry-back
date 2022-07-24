@@ -6,11 +6,13 @@ const storeValidator = (data) => {
     title: joi.string().required().messages({
       "any.required": `عنوان اجباری است`,
       "string.empty": `عنوان اجباری است`,
+      "string.base": `عنوان اجباری است`,
     }),
     parent_id: joi.string(),
     position: joi.string().required().messages({
       "any.required": `جایگاه اجباری است`,
       "string.empty": `جایگاه اجباری است`,
+      "string.base": `جایگاه اجباری است`,
     }),
   });
   const { error } = schema.validate(data, { abortEarly: false });

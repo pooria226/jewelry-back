@@ -35,6 +35,10 @@ const loginValidator = (data) => {
       "string.min": `حداقل باید پنج رقم باشد`,
       "string.max": `حداکثر باید پنج رقم باشد`,
     }),
+    reagent: joi.string().messages({
+      "string.empty": `کد معرف باید رشته ای از حروف باشد`,
+      "string.base": `کد معرف باید رشته ای از حروف باشد`,
+    }),
   });
   const { error } = schema.validate(data, { abortEarly: false });
   const array = [];

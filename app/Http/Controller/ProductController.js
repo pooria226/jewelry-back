@@ -7,19 +7,22 @@ const {
   deleteValidator,
 } = require("../../validator/productValidator");
 const { currentPrice } = require("../../../utils/currentPrice");
+const Category = require("../Model/Category");
 
 module.exports.all = async (req, res) => {
   const { page } = req.params;
   const perPage = 12;
   try {
-    const products = await Product.find()
+    const products = await Product.find({ isDeleted: false })
       .skip((page - 1) * perPage)
       .limit(perPage)
       .populate({ path: "category" })
       .populate({ path: "image_origin", select: "id name" })
       .populate({ path: "images", select: "id name" })
       .sort({ created_at: -1 });
-    const products_count = await (await Product.find()).length;
+    const products_count = await (
+      await Product.find({ isDeleted: false })
+    ).length;
     const pages = Math.ceil(products_count / perPage);
     res.status(200).json({
       data: { products, pages, count: products_count },
@@ -46,7 +49,6 @@ module.exports.store = async (req, res) => {
     const {
       title,
       slug,
-      price,
       weight,
       category,
       image_origin,
@@ -54,15 +56,23 @@ module.exports.store = async (req, res) => {
       description,
       percentage,
       like,
+      discount,
     } = req.body;
     const errors = storeValidator(req.body);
     if (errors.length > 0)
       return res.status(400).json({ success: false, errors: errors });
     const image = await File.findById(image_origin);
+    const price = await currentPrice();
+    const discount_price = Math.round(
+      weight * price +
+        (weight * price * percentage) / 100 -
+        (weight * price + ((weight * price * percentage) / 100) * discount) /
+          100
+    );
     await Product.create({
       title,
       slug,
-      price,
+      price: Math.round(weight * price + (weight * price * percentage) / 100),
       weight,
       category,
       image_origin,
@@ -71,9 +81,12 @@ module.exports.store = async (req, res) => {
       image_origin: image?.name || undefined,
       percentage,
       like,
+      discount,
+      discount_price: discount_price,
     });
     res.status(200).json({ success: true, message: "با موفقیت ثبت شد" });
   } catch (error) {
+    console.log(error);
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }
 };
@@ -83,7 +96,6 @@ module.exports.update = async (req, res) => {
     const {
       title,
       slug,
-      price,
       weight,
       category,
       image_origin,
@@ -91,18 +103,25 @@ module.exports.update = async (req, res) => {
       description,
       percentage,
       like,
+      discount,
     } = req.body;
     const errors = updateValidator({ ...req.body, id: id });
     if (errors.length > 0)
       return res.status(401).json({ success: false, errors: errors });
     const image = await File.findById(image_origin);
-
+    const price = await currentPrice();
+    const discount_price = Math.round(
+      weight * price +
+        (weight * price * percentage) / 100 -
+        (weight * price + ((weight * price * percentage) / 100) * discount) /
+          100
+    );
     await Product.findByIdAndUpdate(
       id,
       {
         title,
         slug,
-        price,
+        price: Math.round(weight * price + (weight * price * percentage) / 100),
         weight,
         category,
         image_origin,
@@ -112,6 +131,8 @@ module.exports.update = async (req, res) => {
         percentage,
         like,
         updated_at: Date.now(),
+        discount,
+        discount_price: discount_price,
       },
       { omitUndefined: true, new: true }
     );
@@ -136,11 +157,18 @@ module.exports.delete = async (req, res) => {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }
 };
+module.exports.category = async (req, res) => {
+  try {
+    const categories = await Category.find({ position: "product" });
+    return res.status(200).json({ data: categories, success: true });
+  } catch (error) {
+    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+  }
+};
 module.exports.priceCorrecdddtion = async (req, res) => {
   try {
     const products = await Product.find();
     const price = await currentPrice();
-    console.log("price", price);
     products.map(async (item) => {
       item.price = Math.round(
         item.weight * price + (item.weight * price * item.percentage) / 100

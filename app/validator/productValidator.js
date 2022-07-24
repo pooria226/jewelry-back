@@ -10,11 +10,6 @@ const storeValidator = (data) => {
       "any.required": `اسلاگ اجباری است`,
       "string.empty": `اسلاگ باید رشته ای از حروف باشد`,
     }),
-
-    price: joi.number().required().messages({
-      "any.required": `قیمت اجباری است`,
-      "number.empty": `قیمت باید عدد باشد`,
-    }),
     weight: joi.number().required().messages({
       "any.required": `وزن اجباری است`,
       "number.empty": `وزن باید عدد باشد`,
@@ -36,6 +31,9 @@ const storeValidator = (data) => {
     percentage: joi.number().required().messages({
       "any.required": `درصد طلا  فروش اجباری است`,
       "number.empty": `درصد طلا  فروش باید عدد باشد`,
+    }),
+    discount: joi.number().messages({
+      "number.empty": `تخفیف  باید عدد باشد`,
     }),
     view: joi.number().messages({
       "string.empty": `تعداد بازدید باید رشته ای از حروف باشد `,
@@ -88,10 +86,6 @@ const updateValidator = (data) => {
       "any.required": `اسلاگ اجباری است`,
       "string.empty": `باید رشته ای از حروف باشد`,
     }),
-    price: joi.number().messages({
-      "any.required": `قیمت اجباری است`,
-      "number.empty": `باید عدد باشد`,
-    }),
     weight: joi.number().messages({
       "any.required": `وزن اجباری است`,
       "number.empty": `باید عدد باشد`,
@@ -117,6 +111,9 @@ const updateValidator = (data) => {
     percentage: joi.number().messages({
       "any.required": `درصد طلا  فروش اجباری است`,
       "number.empty": `درصد طلا  فروش باید عدد باشد`,
+    }),
+    discount: joi.number().messages({
+      "number.empty": `تخفیف  باید عدد باشد`,
     }),
     view: joi.number().messages({
       "string.empty": `تعداد بازدید باید رشته ای از حروف باشد `,

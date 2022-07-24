@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const user = new mongoose.Schema({
   first_name: { type: String, default: null },
   last_name: { type: String, default: null },
+  identification: { type: String, default: null },
+  counter: { type: Number, default: 0 },
   fullname: {
     type: String,
     default: function () {

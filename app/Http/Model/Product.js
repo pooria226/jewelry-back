@@ -5,6 +5,8 @@ const product = mongoose.Schema({
   slug: { type: String, required: true, unique: true },
   price: { type: Number, required: true },
   percentage: { type: Number, required: true },
+  discount: { type: Number, required: false },
+  discount_price: { type: Number, required: false },
   isPublished: { type: Boolean, default: false },
   weight: { type: Number, required: true },
   image_origin: { type: String },

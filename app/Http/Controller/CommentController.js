@@ -1,4 +1,6 @@
 const Comment = require("../Model/Comment");
+const Blog = require("../Model/Blog");
+const Product = require("../Model/Product");
 const { deleteValidator } = require("../../validator/userValidator");
 module.exports.all = async (req, res) => {
   try {
@@ -63,7 +65,20 @@ module.exports.delete = async (req, res) => {
     const errors = deleteValidator(req.params);
     if (errors.length > 0)
       return res.status(400).json({ success: false, errors: errors });
-    await Comment.findByIdAndRemove(id);
+    const comment = await Comment.findById(id);
+    if (comment?.model == "blog") {
+      const blog = await Blog.findById(comment?.target?._id);
+      const filterd = blog?.comments?.filter((item) => item != id);
+      blog.comments = filterd;
+      await blog.save();
+    }
+    if (comment.model == "product") {
+      const product = await Product.findById(comment?.target?._id);
+      const filterd = product?.comments?.filter((item) => item != id);
+      product.comments = filterd;
+      await product.save();
+    }
+    await comment.remove();
     return res.status(200).json({
       success: true,
       message: "دیدگاه با موفقیت حذف شد",

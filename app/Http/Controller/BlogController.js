@@ -155,7 +155,7 @@ module.exports.delete = async (req, res) => {
 };
 module.exports.category = async (req, res) => {
   try {
-    const categories = await Category.find();
+    const categories = await Category.find({ position: "blog" });
     return res.status(200).json({ data: categories, success: true });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });

@@ -12,7 +12,6 @@ module.exports.all = async (req, res) => {
       .skip((page - 1) * perPage)
       .limit(perPage)
       .populate({ path: "category" })
-
       .sort({ create_at: 1 });
     const products_count = await (
       await Product.find({ isPublished: true, isDeleted: false })

@@ -1,6 +1,6 @@
-module.exports.isUser = (req, res, next) => {
+module.exports.isAdmin = (req, res, next) => {
   try {
-    if (req?.user?.role == "user") return next();
+    if (req?.user?.role == "admin") return next();
     return res
       .status(401)
       .json({ success: false, error: "شما به این قسمت دسترسی ندارید" });

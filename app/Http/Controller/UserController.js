@@ -1,6 +1,6 @@
 const User = require("../Model/User.js");
 const File = require("../Model/File.js");
-
+const { v4: uuidv4 } = require("uuid");
 const {
   storeValidator,
   deleteValidator,
@@ -8,6 +8,7 @@ const {
   updateValidator,
 } = require("../../validator/userValidator");
 const { upload } = require("../../middleware/multer");
+const { createTokne } = require("../../../utils/createToken.js");
 
 module.exports.currentUser = async (req, res) => {
   try {
@@ -160,6 +161,7 @@ module.exports.store = async (req, res) => {
         ],
       });
     const image = await File.findById(avatar);
+
     await User.create({
       first_name,
       last_name,
@@ -170,6 +172,7 @@ module.exports.store = async (req, res) => {
       isVerifyd,
       isActive,
       date_of_birth,
+      identification: uuidv4() + "-" + Date.now(),
     });
     return res.status(200).json({
       success: true,
