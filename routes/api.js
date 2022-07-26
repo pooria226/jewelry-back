@@ -17,6 +17,7 @@ const CommentController = require("../app/Http/Controller/CommentController");
 const InstructionController = require("../app/Http/Controller/InstructionController");
 const OrderController = require("../app/Http/Controller/OrderController");
 const DashboardController = require("../app/Http/Controller/DashboardController");
+const FaqController = require("../app/Http/Controller/FaqController");
 const HomeController = require("../app/Http/Controller/website/HomeController");
 const WebBlogController = require("../app/Http/Controller/website/BlogController");
 const WebProductController = require("../app/Http/Controller/website/ProductController");
@@ -64,13 +65,16 @@ router.post(
 );
 // End User
 
+// Start Faq
+router.get("/faq/all/:page", authentication, isBloger, FaqController.all);
+router.post("/faq", authentication, isBloger, FaqController.store);
+router.get("/faq/:id", authentication, isBloger, FaqController.show);
+router.put("/faq/:id", authentication, isBloger, FaqController.update);
+router.delete("/faq/:id", authentication, isAdmin, FaqController.delete);
+// End Faq
+
 // Start Order
-router.get(
-  "/orders/verify",
-  authentication,
-  isUser,
-  OrderController.verifyOrder
-);
+router.get("/orders/verify", OrderController.verifyOrder);
 router.get("/orders/all", authentication, isUser, OrderController.ordersAll);
 router.get(
   "/orders/pay/:orderId",
@@ -347,6 +351,7 @@ router.post(
 router.get("/public/home/slider", HomeController.all);
 router.get("/public/home/favorite", public, HomeController.favoriteLength);
 router.get("/public/home/order", public, HomeController.orderLength);
+router.get("/public/home/faq", public, HomeController.faq);
 // end home
 
 // Start about

@@ -93,13 +93,13 @@ module.exports.login = async (req, res) => {
           .json({ message: "خوش اومدی", success: true, token: token });
       } else {
         return res
-          .status(400)
-          .json({ message: "کد فعال سازی منقضی شده است", success: false });
+          .status(200)
+          .json({ message: "کد تایید اشتباه است", success: false });
       }
     } else {
       return res
-        .status(400)
-        .json({ message: "کد فعال سازی منقضی شده است", success: false });
+        .status(200)
+        .json({ message: "کد تایید منقضی شده است", success: false });
     }
   } catch (error) {
     console.log("error", error);

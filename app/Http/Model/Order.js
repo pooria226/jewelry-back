@@ -2,7 +2,8 @@ const mongoose = require("mongoose");
 
 const order = mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  products: { type: Array },
+  address: { type: Object },
+  products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
   pay: { type: Boolean, default: false },
   status: { type: Number, default: 1 },
   delivery_code: { type: String, default: null },

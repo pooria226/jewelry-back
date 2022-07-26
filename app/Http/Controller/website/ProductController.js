@@ -240,43 +240,30 @@ module.exports.order = async (req, res) => {
   try {
     const { id } = req.params;
     const product = await Product.findById(id);
-    const order = await Order.findOne({ user: req?.user?._id, pay: false });
+    const order = await Order.findOne({
+      user: req?.user?._id,
+      pay: false,
+    }).populate({
+      path: "products",
+    });
     if (order) {
-      const dupItem = order.products.filter(
-        (item) => item?._id.toString() == product?._id.toString()
-      );
+      const dupItem = order.products.filter((item) => {
+        return item?.id?.toString() == product?._id.toString();
+      });
       if (dupItem.length > 0) {
         const filterdItem = order.products.filter(
-          (item) => item?._id.toString() != product?._id.toString()
+          (item) => item?.id.toString() != product?._id.toString()
         );
         order.products = filterdItem;
         await order.save();
       } else {
-        order.products.push({
-          _id: product?._id,
-          title: product?.title,
-          price: product?.price,
-          image_origin: product?.image_origin,
-          weight: product?.weight,
-          slug: product?.slug,
-          increase_at: Date.now(),
-        });
+        order.products.push(product?._id);
         await order.save();
       }
     } else {
       await Order.create({
         user: req?.user?._id,
-        products: [
-          {
-            _id: product?._id,
-            title: product?.title,
-            price: product?.price,
-            image_origin: product?.image_origin,
-            weight: product?.weight,
-            slug: product?.slug,
-            increase_at: Date.now(),
-          },
-        ],
+        products: [product?._id],
       });
     }
     return res.status(200).json({
@@ -291,7 +278,6 @@ module.exports.addComment = async (req, res) => {
   try {
     const { content, slug } = req.body;
     const product = await Product.findOne({ slug });
-    console.log("product", product);
     const comment = await Comment.create({
       content: content,
       user: req?.user?._id,

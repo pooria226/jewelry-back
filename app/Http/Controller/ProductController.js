@@ -8,6 +8,7 @@ const {
 } = require("../../validator/productValidator");
 const { currentPrice } = require("../../../utils/currentPrice");
 const Category = require("../Model/Category");
+const { pay } = require("../../../utils/goldPrice");
 
 module.exports.all = async (req, res) => {
   const { page } = req.params;
@@ -63,16 +64,12 @@ module.exports.store = async (req, res) => {
       return res.status(400).json({ success: false, errors: errors });
     const image = await File.findById(image_origin);
     const price = await currentPrice();
-    const discount_price = Math.round(
-      weight * price +
-        (weight * price * percentage) / 100 -
-        (weight * price + ((weight * price * percentage) / 100) * discount) /
-          100
-    );
+    const variable = await pay(weight, price, percentage);
+    const discount_price = Math.round(variable - (variable * discount) / 100);
     await Product.create({
       title,
       slug,
-      price: Math.round(weight * price + (weight * price * percentage) / 100),
+      price: variable,
       weight,
       category,
       image_origin,
@@ -110,18 +107,14 @@ module.exports.update = async (req, res) => {
       return res.status(401).json({ success: false, errors: errors });
     const image = await File.findById(image_origin);
     const price = await currentPrice();
-    const discount_price = Math.round(
-      weight * price +
-        (weight * price * percentage) / 100 -
-        (weight * price + ((weight * price * percentage) / 100) * discount) /
-          100
-    );
+    const variable = await pay(weight, price, percentage);
+    const discount_price = Math.round(variable - (variable * discount) / 100);
     await Product.findByIdAndUpdate(
       id,
       {
         title,
         slug,
-        price: Math.round(weight * price + (weight * price * percentage) / 100),
+        price: variable,
         weight,
         category,
         image_origin,
@@ -148,7 +141,7 @@ module.exports.delete = async (req, res) => {
     const errors = deleteValidator(req.params);
     if (errors.length > 0)
       return res.status(400).json({ success: false, errors: errors });
-    await Product.findByIdAndRemove(id);
+    // await Product.findByIdAndRemove(id);
     return res.status(200).json({
       success: true,
       message: "با موفقیت حذف شد",
@@ -170,9 +163,7 @@ module.exports.priceCorrecdddtion = async (req, res) => {
     const products = await Product.find();
     const price = await currentPrice();
     products.map(async (item) => {
-      item.price = Math.round(
-        item.weight * price + (item.weight * price * item.percentage) / 100
-      );
+      item.price = await pay(item?.weight, price, item?.percentage);
       await item.save();
     });
     return res.status(200).json({

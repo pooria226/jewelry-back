@@ -8,3 +8,6 @@ module.exports.goldPrice = async () => {
       console.log(err);
     });
 };
+module.exports.pay = async (weight = 0, price = 0, percentage = 0) => {
+  return Math.round(weight * price + (weight * price * percentage) / 100);
+};
