@@ -63,7 +63,6 @@ module.exports.search = async (req, res) => {
     if (category) {
       finder.category = category;
     }
-
     if (weightFrom && !weightTo) {
       finder.weight = { $gte: weightFrom };
     }

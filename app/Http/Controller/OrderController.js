@@ -8,6 +8,9 @@ const Address = require("../Model/Address.js");
 const Product = require("../Model/Product.js");
 const { currentPrice } = require("../../../utils/currentPrice.js");
 const { pay } = require("../../../utils/goldPrice.js");
+const Discount = require("../Model/Discount.js");
+const { handleSendSms } = require("../../../utils/sms.js");
+const User = require("../Model/User.js");
 module.exports.ordersAll = async (req, res) => {
   try {
     const orders = await Order.find({
@@ -39,6 +42,7 @@ module.exports.ordersPay = async (req, res) => {
     orders?.products?.map(async (item, index) => {
       const product = await Product.findById(item);
       const variable = await pay(product?.weight, price, product?.percentage);
+
       product.price = variable;
       product.discount_price = Math.round(
         variable - (variable * product?.discount) / 100
@@ -47,19 +51,25 @@ module.exports.ordersPay = async (req, res) => {
     });
     const order_update = await Order.findById(orderId).populate({
       path: "products",
-      select: "title price",
     });
+    const discount = await Discount.findById(order_update?.discount);
     const product_price = order_update.products.reduce((acc, item) => {
-      return (acc += item.price);
+      if (item?.discount != 0) {
+        return (acc += item.discount_price);
+      } else {
+        return (acc += item.price);
+      }
     }, 0);
+    const sum = Math.round(
+      product_price - (product_price * discount?.percentage || 0) / 100
+    );
     if (address.length == 0) {
       return res
         .status(200)
         .json({ success: false, message: "ادرسی برای خود انتخاب نکردید" });
     }
-
     const result = await zarinpal.PaymentRequest({
-      Amount: product_price,
+      Amount: sum,
       CallbackURL: "http://localhost:3001/api/orders/verify",
       Description: "A Payment from Yazdan Gold",
       Mobile: req.user.phone,
@@ -67,7 +77,7 @@ module.exports.ordersPay = async (req, res) => {
     if (result.status == 100) {
       await Payment.create({
         user: req.user._id,
-        amount: product_price,
+        amount: sum,
         authority: result.authority,
         orders: order_update._id,
       });
@@ -84,13 +94,14 @@ module.exports.verifyOrder = async (req, res) => {
   try {
     const authority = req.query.Authority;
     const status = req.query.Status;
-
     const payment = await Payment.findOne({ authority });
+    const user = await User.findById(payment?.user);
     if (status == "OK") {
       const result = await zarinpal.PaymentVerification({
         Amount: payment.amount,
         Authority: authority,
       });
+
       if (result.status == -21) {
         res.redirect("http://localhost:3000/dashboard");
       } else {
@@ -98,17 +109,24 @@ module.exports.verifyOrder = async (req, res) => {
         payment.success = true;
         await payment.save();
         const order = await Order.findById(payment.orders);
+        await Discount.findByIdAndRemove(order?.discount);
         const address = await Address.findOne({
           user: payment?.user,
           selected: true,
         });
+
         const code = codeGenerator();
         const code_hash = await bcrypt.hash(code.toString(), 10);
         order.pay = true;
         order.status = 1;
         order.delivery_code = code_hash;
         order.address = { ...address };
+        order.useDiscount = true;
         await order.save();
+        await handleSendSms(
+          `درخواست شما با موفقیت ثبت شد. کد تحویل شما: ${code}`,
+          user.phone
+        );
         res.redirect("http://localhost:3000/dashboard");
       }
     } else {

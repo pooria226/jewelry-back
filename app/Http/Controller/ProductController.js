@@ -162,8 +162,13 @@ module.exports.priceCorrecdddtion = async (req, res) => {
   try {
     const products = await Product.find();
     const price = await currentPrice();
+    console.log("price", price);
     products.map(async (item) => {
-      item.price = await pay(item?.weight, price, item?.percentage);
+      const variable = await pay(item?.weight, price, item?.percentage);
+      item.price = variable;
+      item.discount_price = Math.round(
+        variable - (variable * item?.discount) / 100
+      );
       await item.save();
     });
     return res.status(200).json({

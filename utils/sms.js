@@ -6,7 +6,7 @@ module.exports.handleSendSms = async (message, phone) => {
     .post(
       "https://api.sms.ir/v1/send/bulk",
       {
-        lineNumber: 30007732001160,
+        lineNumber: 30007732002798,
         messageText: message,
         mobiles: [phone],
         sendDateTime: null,

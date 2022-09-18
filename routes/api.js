@@ -18,6 +18,7 @@ const InstructionController = require("../app/Http/Controller/InstructionControl
 const OrderController = require("../app/Http/Controller/OrderController");
 const DashboardController = require("../app/Http/Controller/DashboardController");
 const FaqController = require("../app/Http/Controller/FaqController");
+const DiscountController = require("../app/Http/Controller/DiscountController");
 const HomeController = require("../app/Http/Controller/website/HomeController");
 const WebBlogController = require("../app/Http/Controller/website/BlogController");
 const WebProductController = require("../app/Http/Controller/website/ProductController");
@@ -52,6 +53,12 @@ router.post("/user/current", authentication, UserController.currentUser);
 router.get("/user/profile", authentication, UserController.profile);
 router.post("/user/profile", authentication, UserController.profileUpdate);
 router.post("/user/avatar", authentication, UserController.avatarUpdate);
+router.get(
+  "/user/discount",
+  authentication,
+  isUser,
+  UserController.generateDiscount
+);
 router.post("/user/all/:page", authentication, isAdmin, UserController.all);
 router.post("/user", authentication, isAdmin, UserController.store);
 router.get("/user/:id", authentication, isAdmin, UserController.show);
@@ -63,6 +70,7 @@ router.post(
   isAdmin,
   UserController.search
 );
+
 // End User
 
 // Start Faq
@@ -83,6 +91,11 @@ router.get(
   OrderController.ordersPay
 );
 // End Order
+
+// Start Discount
+router.get("/discount/all", authentication, isUser, DiscountController.all);
+router.post("/discount/use", authentication, isUser, DiscountController.use);
+// End Discount
 
 // Start Tag
 router.get("/tag/all/:page", authentication, isBloger, TagController.all);

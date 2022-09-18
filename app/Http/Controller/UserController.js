@@ -9,6 +9,7 @@ const {
 } = require("../../validator/userValidator");
 const { upload } = require("../../middleware/multer");
 const { createTokne } = require("../../../utils/createToken.js");
+const Discount = require("../Model/Discount.js");
 
 module.exports.currentUser = async (req, res) => {
   try {
@@ -256,6 +257,30 @@ module.exports.search = async (req, res) => {
     res
       .status(200)
       .json({ success: true, data: { users, pages, count: users_count } });
+  } catch (error) {
+    res.status(400).json({ message: "مشکلی پیش امده", success: false });
+  }
+};
+module.exports.generateDiscount = async (req, res) => {
+  try {
+    const user = await User.findById(req?.user?._id);
+    if (user?.counter < 3) {
+      return res
+        .status(200)
+        .json({ success: false, message: "باید 3 نفر را دعوت کرده باشید" });
+    }
+    if (user?.counter == 3) {
+      await Discount.create({
+        user: user?._id,
+        code: uuidv4(),
+        percentage: 1,
+      });
+      user.counter = 0;
+      await user.save();
+    }
+    return res
+      .status(200)
+      .json({ success: true, message: "با موفقیت انجام شد" });
   } catch (error) {
     res.status(400).json({ message: "مشکلی پیش امده", success: false });
   }

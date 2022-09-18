@@ -9,17 +9,17 @@ module.exports.orders = async (req, res) => {
       user: req?.user?._id,
       status: 1,
       pay: true,
-    });
+    }).populate({ path: "products" });
     const deliveredOrder = await Order.find({
       user: req?.user?._id,
       status: 2,
       pay: true,
-    });
+    }).populate({ path: "products" });
     const returnedOrder = await Order.find({
       user: req?.user?._id,
       status: 3,
       pay: true,
-    });
+    }).populate({ path: "products" });
     res.status(200).json({
       data: { openOrder, deliveredOrder, returnedOrder },
       success: true,

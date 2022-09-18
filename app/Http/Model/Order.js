@@ -4,6 +4,8 @@ const order = mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   address: { type: Object },
   products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+  discount: { type: mongoose.Schema.Types.ObjectId, ref: "Discount" },
+  useDiscount: { type: Boolean, default: false },
   pay: { type: Boolean, default: false },
   status: { type: Number, default: 1 },
   delivery_code: { type: String, default: null },

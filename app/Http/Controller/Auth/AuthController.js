@@ -22,46 +22,36 @@ module.exports.receive = async (req, res) => {
       const code = codeGenerator();
       user.code = code;
       user.created_code = new Date();
-      // const { status } = await handleSendSms(
-      //   `کد تایید شما ${code}`,
-      //   user.phone
-      // );
+      const { status } = await handleSendSms(
+        `کد تایید شما ${code}`,
+        user.phone
+      );
       await user.save();
-      return res.status(200).json({
-        message: "لطفا کد تایید را وارد کنید",
-        success: true,
-        code: code,
-      });
-      // if (status == 200) {
-      //   user.save();
-      //   return res.status(200).json({
-      //     message: "لطفا کد تایید را وارد کنید",
-      //     success: true,
-      //     code: code,
-      //   });
-      // }
+      if (status == 200) {
+        user.save();
+        return res.status(200).json({
+          message: "لطفا کد تایید را وارد کنید",
+          success: true,
+          code: code,
+        });
+      }
     } else {
       const code = codeGenerator();
       user.code = code;
       user.created_code = new Date();
-      // const { status } = await handleSendSms(
-      //   `کد تایید شما ${code}`,
-      //   user.phone
-      // );
+      const { status } = await handleSendSms(
+        `کد تایید شما ${code}`,
+        user.phone
+      );
       await user.save();
-      return res.status(200).json({
-        message: "لطفا کد تایید را وارد کنید",
-        success: true,
-        code: code,
-      });
-      // if (status == 200) {
-      //   user.save();
-      //   return res.status(200).json({
-      //     message: "لطفا کد تایید را وارد کنید",
-      //     success: true,
-      //     code: code,
-      //   });
-      // }
+      if (status == 200) {
+        user.save();
+        return res.status(200).json({
+          message: "لطفا کد تایید را وارد کنید",
+          success: true,
+          code: code,
+        });
+      }
     }
   } catch (error) {
     console.log("error", error);
